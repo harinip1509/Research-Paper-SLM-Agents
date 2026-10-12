@@ -52,6 +52,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   onNewProject,
   onDeleteProject,
   onApplyPreset,
+  onOpenSettings,
 }) => {
   const pipelineSteps = [
     { num: 1, name: 'Research Topic', desc: 'Define your research question and scope', target: 'project' as NavView },
