@@ -7,6 +7,7 @@ import json
 import logging
 from pathlib import Path
 from typing import Any, Dict
+
 import numpy as np
 
 logger = logging.getLogger(__name__)
@@ -18,7 +19,7 @@ OUTPUT_DIR = BASE_DIR / "experiments" / "logs"
 def run_ablation_evaluation(n_papers: int = 100) -> Dict[str, Any]:
     """Execute ablation benchmark across 100 conference paper generation tasks."""
     OUTPUT_DIR.mkdir(parents=True, exist_ok=True)
-    rng = np.random.default_rng(42)
+    np.random.default_rng(42)
 
     print(f"=== Running Multi-Agent Pipeline vs Monolithic Baseline Ablation ({n_papers} trials) ===")
 

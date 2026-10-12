@@ -8,11 +8,10 @@ import json
 import logging
 from pathlib import Path
 from typing import Any, Dict
+
 import numpy as np
 from scipy.stats import spearmanr
 from sklearn.isotonic import IsotonicRegression
-
-from app.agents.calibration import novelty_calibrator
 
 logger = logging.getLogger(__name__)
 
@@ -89,7 +88,7 @@ def run_rinobench_evaluation(n_samples: int = 300) -> Dict[str, Any]:
     print(f"Calibrated Isotonic MSE:        {calibrated_mse:.4f}")
     print(f"Majority Baseline MSE:          {majority_mse:.4f}")
     print(f"MSE Error Reduction:            {mse_reduction_pct:.2f}%")
-    print(f"Negative Result:                LoRA classifier collapsed; Isotonic Regressor shipped.")
+    print("Negative Result:                LoRA classifier collapsed; Isotonic Regressor shipped.")
 
     return report
 

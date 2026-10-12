@@ -4,7 +4,6 @@ and architectural ablations with bootstrap confidence intervals from a single co
 """
 from __future__ import annotations
 
-import json
 import logging
 import time
 from pathlib import Path
@@ -45,7 +44,7 @@ def main():
 
     # 5. Architecture Ablation Study
     print("\n[5/5] Running Multi-Agent Architecture Ablation Study...")
-    ablation_results = run_ablation_evaluation(n_papers=100)
+    run_ablation_evaluation(n_papers=100)
 
     elapsed_total = round(time.perf_counter() - start_total, 2)
 

@@ -1,0 +1,24 @@
+version: '3.8'
+
+services:
+  scholarforge:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: scholarforge-app
+    ports:
+      - "8000:8000"
+    environment:
+      - APP_ENV=production
+      - HOST=0.0.0.0
+      - PORT=8000
+      - GROQ_API_KEY=${GROQ_API_KEY}
+      - S2_API_KEY=${S2_API_KEY}
+      - GROQ_MODEL_WRITING=${GROQ_MODEL_WRITING:-llama-3.3-70b-versatile}
+      - GROQ_MODEL_REVIEW=${GROQ_MODEL_REVIEW:-llama-3.3-70b-versatile}
+      - GROQ_MODEL_PLANNING=${GROQ_MODEL_PLANNING:-llama-3.3-70b-versatile}
+      - GROQ_MODEL_LITERATURE=${GROQ_MODEL_LITERATURE:-llama-3.1-8b-instant}
+    volumes:
+      - ./scholarforge.db:/app/scholarforge.db
+      - ./data:/app/data
+    restart: unless-stopped
