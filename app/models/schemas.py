@@ -196,3 +196,27 @@ class AuthResponse(BaseModel):
     token: str
     message: Optional[str] = "Success"
 
+
+class ProjectSummary(BaseModel):
+    id: str
+    title: str
+    abstract: str
+    venue: str = "ieee"
+    uniqueness_score: Optional[float] = None
+    calibrated_rating: Optional[float] = None
+    papers_count: int = 0
+    created_at: str
+    updated_at: str
+
+
+class ProjectSaveRequest(BaseModel):
+    id: Optional[str] = None
+    title: str
+    abstract: str
+    user_notes: Optional[str] = ""
+    venue: Optional[str] = "ieee"
+    uniqueness: Optional[TopicUniquenessResponse] = None
+    draft: Optional[PaperDraft] = None
+    papers: Optional[List[Paper]] = []
+
+

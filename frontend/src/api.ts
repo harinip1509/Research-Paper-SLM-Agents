@@ -7,6 +7,7 @@ import {
   ReviewCritique,
   SimilarityReport,
   FormatConstraintReport,
+  ProjectSummary,
 } from './types'
 
 const API_BASE = '/api'
@@ -241,3 +242,51 @@ export async function apiExportFormat(params: {
   }
   return res.json()
 }
+
+export async function apiListProjects(): Promise<ProjectSummary[]> {
+  const res = await fetch(`${API_BASE}/projects`, {
+    headers: { ...getAuthHeader() },
+  })
+  if (!res.ok) return []
+  return res.json().catch(() => [])
+}
+
+export async function apiSaveProject(params: {
+  id?: string
+  title: string
+  abstract: string
+  user_notes?: string
+  venue?: string
+  uniqueness?: TopicUniquenessResponse | null
+  draft?: PaperDraft | null
+  papers?: Paper[]
+}): Promise<{ id: string; status: string }> {
+  const res = await fetch(`${API_BASE}/projects`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
+    body: JSON.stringify(params),
+  })
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: 'Failed to save project' }))
+    throw new Error(parseErrorMessage(err, 'Failed to save project'))
+  }
+  return res.json()
+}
+
+export async function apiGetProject(id: string): Promise<any> {
+  const res = await fetch(`${API_BASE}/projects/${id}`, {
+    headers: { ...getAuthHeader() },
+  })
+  if (!res.ok) {
+    throw new Error('Project not found')
+  }
+  return res.json()
+}
+
+export async function apiDeleteProject(id: string): Promise<void> {
+  await fetch(`${API_BASE}/projects/${id}`, {
+    method: 'DELETE',
+    headers: { ...getAuthHeader() },
+  })
+}
+

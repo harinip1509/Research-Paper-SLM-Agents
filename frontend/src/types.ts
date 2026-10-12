@@ -124,3 +124,16 @@ export interface FormatConstraintReport {
   abstract_words: number
   estimated_pages: number
 }
+
+export interface ProjectSummary {
+  id: string
+  title: string
+  abstract: string
+  venue: string
+  uniqueness_score: number | null
+  calibrated_rating: number | null
+  papers_count: number
+  created_at: string
+  updated_at: string
+}
+

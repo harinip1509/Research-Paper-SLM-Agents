@@ -34,3 +34,37 @@ async def test_uniqueness_endpoint():
         assert "coverage_caveat" in data
         assert "calibrated_novelty_rating" in data
         assert 0.0 <= data["uniqueness_score"] <= 100.0
+
+
+@pytest.mark.asyncio
+async def test_projects_crud_endpoints():
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+        # 1. Save project
+        save_payload = {
+            "title": "Quantum Variational ANSATZ for Drug Discovery",
+            "abstract": "Investigating parameterized quantum circuits for molecular docking and ligand affinity.",
+            "user_notes": "Tested on ChEMBL benchmark.",
+            "venue": "ieee",
+        }
+        resp = await client.post("/api/projects", json=save_payload)
+        assert resp.status_code == 200
+        p_data = resp.json()
+        assert "id" in p_data
+        project_id = p_data["id"]
+
+        # 2. List projects
+        list_resp = await client.get("/api/projects")
+        assert list_resp.status_code == 200
+        projects = list_resp.json()
+        assert any(p["id"] == project_id for p in projects)
+
+        # 3. Get single project
+        get_resp = await client.get(f"/api/projects/{project_id}")
+        assert get_resp.status_code == 200
+        proj = get_resp.json()
+        assert proj["title"] == "Quantum Variational ANSATZ for Drug Discovery"
+
+        # 4. Delete project
+        del_resp = await client.delete(f"/api/projects/{project_id}")
+        assert del_resp.status_code == 200
+

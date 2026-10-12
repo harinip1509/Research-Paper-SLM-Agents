@@ -1,7 +1,9 @@
 """FastAPI API routes for ScholarForge covering all 7 specialized agents."""
 from __future__ import annotations
 
+import json
 import logging
+import uuid
 from typing import Any, Dict, List, Optional
 
 from fastapi import APIRouter, Header, HTTPException, Query
@@ -16,6 +18,7 @@ from app.agents.similarity_agent import similarity_citation_agent
 from app.agents.uniqueness_agent import uniqueness_agent
 from app.agents.writing_agent import writing_agent
 from app.clients.semantic_scholar import s2_client
+from app.core.database import get_db_connection
 from app.models.schemas import (
     AuthResponse,
     CitationVerificationResult,
@@ -27,6 +30,8 @@ from app.models.schemas import (
     PaperDraft,
     PaperDraftSection,
     PaperPlan,
+    ProjectSaveRequest,
+    ProjectSummary,
     ReviewCritique,
     SimilarityReport,
     TopicUniquenessRequest,
@@ -411,4 +416,143 @@ async def auth_logout(authorization: Optional[str] = Header(None)) -> Dict[str, 
         token = authorization.split("Bearer ", 1)[1].strip()
         auth_service.logout(token)
     return {"message": "Logged out successfully"}
+
+
+# =====================================================================
+# Research Project Management (State & History)
+# =====================================================================
+
+@router.get("/projects", response_model=List[ProjectSummary])
+async def list_projects(authorization: Optional[str] = Header(None)) -> List[ProjectSummary]:
+    """List research projects for current user or recent active projects."""
+    user_id = None
+    if authorization and authorization.startswith("Bearer "):
+        token = authorization.split("Bearer ", 1)[1].strip()
+        user = auth_service.get_user_by_token(token)
+        if user:
+            user_id = user["id"]
+
+    conn = get_db_connection()
+    query = "SELECT id, title, abstract, venue, uniqueness_score, calibrated_rating, papers_json, created_at, updated_at FROM projects"
+    params: tuple[Any, ...] = ()
+    if user_id:
+        query += " WHERE user_id = ? OR user_id IS NULL"
+        params = (user_id,)
+    query += " ORDER BY updated_at DESC LIMIT 20"
+
+    rows = conn.execute(query, params).fetchall()
+    results: List[ProjectSummary] = []
+    for r in rows:
+        papers_count = 0
+        if r["papers_json"]:
+            try:
+                p_list = json.loads(r["papers_json"])
+                papers_count = len(p_list)
+            except Exception:
+                pass
+        results.append(
+            ProjectSummary(
+                id=r["id"],
+                title=r["title"],
+                abstract=r["abstract"],
+                venue=r["venue"] or "ieee",
+                uniqueness_score=r["uniqueness_score"],
+                calibrated_rating=r["calibrated_rating"],
+                papers_count=papers_count,
+                created_at=str(r["created_at"]),
+                updated_at=str(r["updated_at"]),
+            )
+        )
+    return results
+
+
+@router.post("/projects")
+async def save_project(req: ProjectSaveRequest, authorization: Optional[str] = Header(None)) -> Dict[str, Any]:
+    """Save or update a research project state."""
+    user_id = None
+    if authorization and authorization.startswith("Bearer "):
+        token = authorization.split("Bearer ", 1)[1].strip()
+        user = auth_service.get_user_by_token(token)
+        if user:
+            user_id = user["id"]
+
+    project_id = req.id or str(uuid.uuid4())[:8]
+    conn = get_db_connection()
+
+    uniqueness_score = req.uniqueness.uniqueness_score if req.uniqueness else None
+    calibrated_rating = req.uniqueness.calibrated_novelty_rating if req.uniqueness else None
+    overlap_meter_json = req.uniqueness.overlap_meter.model_dump_json() if req.uniqueness else None
+    draft_json = req.draft.model_dump_json() if req.draft else None
+    papers_json = json.dumps([p.model_dump() for p in (req.papers or [])]) if req.papers else None
+
+    with conn:
+        conn.execute(
+            """
+            INSERT INTO projects (id, user_id, title, abstract, user_notes, venue, uniqueness_score, calibrated_rating, overlap_meter_json, draft_json, papers_json, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, CURRENT_TIMESTAMP)
+            ON CONFLICT(id) DO UPDATE SET
+                title=excluded.title,
+                abstract=excluded.abstract,
+                user_notes=excluded.user_notes,
+                venue=excluded.venue,
+                uniqueness_score=excluded.uniqueness_score,
+                calibrated_rating=excluded.calibrated_rating,
+                overlap_meter_json=excluded.overlap_meter_json,
+                draft_json=excluded.draft_json,
+                papers_json=excluded.papers_json,
+                updated_at=CURRENT_TIMESTAMP
+            """,
+            (
+                project_id,
+                user_id,
+                req.title,
+                req.abstract,
+                req.user_notes,
+                req.venue or "ieee",
+                uniqueness_score,
+                calibrated_rating,
+                overlap_meter_json,
+                draft_json,
+                papers_json,
+            ),
+        )
+
+    return {"id": project_id, "status": "saved"}
+
+
+@router.get("/projects/{project_id}")
+async def get_project(project_id: str) -> Dict[str, Any]:
+    """Retrieve full research project state."""
+    conn = get_db_connection()
+    row = conn.execute("SELECT * FROM projects WHERE id = ?", (project_id,)).fetchone()
+    if not row:
+        raise HTTPException(status_code=404, detail="Project not found")
+
+    d = dict(row)
+    if d.get("papers_json"):
+        try:
+            d["papers"] = json.loads(d["papers_json"])
+        except Exception:
+            d["papers"] = []
+    if d.get("draft_json"):
+        try:
+            d["draft"] = json.loads(d["draft_json"])
+        except Exception:
+            d["draft"] = None
+    if d.get("overlap_meter_json"):
+        try:
+            d["overlap_meter"] = json.loads(d["overlap_meter_json"])
+        except Exception:
+            d["overlap_meter"] = None
+    return d
+
+
+@router.delete("/projects/{project_id}")
+async def delete_project(project_id: str) -> Dict[str, str]:
+    """Delete a research project."""
+    conn = get_db_connection()
+    with conn:
+        conn.execute("DELETE FROM projects WHERE id = ?", (project_id,))
+    return {"message": "Project deleted successfully"}
+
 

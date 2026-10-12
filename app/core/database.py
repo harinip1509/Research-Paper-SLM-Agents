@@ -89,9 +89,26 @@ def init_db() -> None:
                 FOREIGN KEY(user_id) REFERENCES users(id) ON DELETE CASCADE
             );
 
+            CREATE TABLE IF NOT EXISTS projects (
+                id TEXT PRIMARY KEY,
+                user_id TEXT,
+                title TEXT NOT NULL,
+                abstract TEXT NOT NULL,
+                user_notes TEXT,
+                venue TEXT DEFAULT 'ieee',
+                uniqueness_score REAL,
+                calibrated_rating REAL,
+                overlap_meter_json TEXT,
+                draft_json TEXT,
+                papers_json TEXT,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            );
+
             CREATE INDEX IF NOT EXISTS idx_papers_title ON papers(title);
             CREATE INDEX IF NOT EXISTS idx_search_created ON search_cache(created_at);
             CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);
+            CREATE INDEX IF NOT EXISTS idx_projects_user ON projects(user_id);
             """
         )
 

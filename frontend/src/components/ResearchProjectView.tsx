@@ -1,11 +1,12 @@
 import React, { useState } from 'react'
-import { ArrowRight, Sparkles, Sliders, BookOpen } from 'lucide-react'
+import { ArrowRight, Sparkles, BookOpen } from 'lucide-react'
 import { NavView } from './Sidebar'
-import { apiComputeUniqueness, apiDraftFullPaper } from '../api'
+import { apiComputeUniqueness, apiDraftFullPaper, apiSaveProject } from '../api'
 import { Paper, TopicUniquenessResponse, PaperDraft } from '../types'
 
 interface ResearchProjectViewProps {
   onNavigate: (view: NavView) => void
+  projectId: string | null
   title: string
   setTitle: (t: string) => void
   abstract: string
@@ -17,34 +18,36 @@ interface ResearchProjectViewProps {
   setPapers: (p: Paper[]) => void
   setUniqueness: (u: TopicUniquenessResponse) => void
   setDraft: (d: PaperDraft) => void
+  onProjectSaved?: (id: string) => void
 }
 
 const PRESETS = [
   {
-    title: 'Transformer Models for Clinical NLP',
+    title: 'Quantum Neural Networks for Molecular Docking',
+    abstract:
+      'We formulate parameterized quantum circuits for predicting non-covalent binding affinity and molecular docking conformations, evaluating variational ansatz architectures against classical baselines on the ChEMBL benchmark.',
+    notes: 'Grounding in variational eigensolvers; evaluates binding energy and RMSD.',
+    venue: 'ieee',
+  },
+  {
+    title: 'Transformer Models for Clinical NLP and EHR Summarization',
     abstract:
       'We examine pre-trained transformer representations adapted for clinical narrative electronic health records, addressing domain terminology and tokenization bottlenecks.',
     notes: 'Compared on MIMIC-III benchmark; evaluates BioBERT and ClinicalBERT baselines.',
     venue: 'acl',
   },
   {
-    title: 'Federated Learning in Healthcare Data Privacy',
+    title: 'Differential Privacy in Federated Healthcare Optimization',
     abstract:
       'A differential-privacy aware federated optimization framework across hospital silos, maintaining strict patient data confidentiality while achieving centralized AUC parity.',
     notes: 'Non-IID distribution across 5 synthetic hospital nodes; epsilon=1.2 DP guarantee.',
-    venue: 'ieee',
-  },
-  {
-    title: 'Zero-Shot Summarization of Clinical Trial Reports',
-    abstract:
-      'Instruction-tuned parameter-efficient adapters for abstractive summarization of Phase III clinical trial protocol documents without manual target annotations.',
-    notes: 'Evaluated against ROUGE-L and expert human rubrics.',
     venue: 'acm',
   },
 ]
 
 export const ResearchProjectView: React.FC<ResearchProjectViewProps> = ({
   onNavigate,
+  projectId,
   title,
   setTitle,
   abstract,
@@ -56,6 +59,7 @@ export const ResearchProjectView: React.FC<ResearchProjectViewProps> = ({
   setPapers,
   setUniqueness,
   setDraft,
+  onProjectSaved,
 }) => {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -89,8 +93,27 @@ export const ResearchProjectView: React.FC<ResearchProjectViewProps> = ({
       })
       setDraft(dRes)
 
-      // Navigate to Agent Status view to show completed pipeline!
-      onNavigate('agent-status')
+      // 3. Save project
+      try {
+        const saved = await apiSaveProject({
+          id: projectId || undefined,
+          title,
+          abstract,
+          user_notes: userNotes,
+          venue,
+          uniqueness: uRes,
+          draft: dRes,
+          papers: uRes.recommended_papers,
+        })
+        if (onProjectSaved) {
+          onProjectSaved(saved.id)
+        }
+      } catch (saveErr) {
+        console.warn('Auto-save error:', saveErr)
+      }
+
+      // Navigate to Paper Workspace so user can see generated text!
+      onNavigate('workspace')
     } catch (err: any) {
       setError(err.message || 'Pipeline execution failed.')
     } finally {
@@ -128,6 +151,7 @@ export const ResearchProjectView: React.FC<ResearchProjectViewProps> = ({
         {PRESETS.map((p, idx) => (
           <button
             key={idx}
+            type="button"
             onClick={() => applyPreset(p)}
             className="px-3 py-1 rounded-lg bg-white border border-[#e2e8f0] text-xs font-medium text-slate-700 hover:border-[#2563eb] hover:text-[#2563eb] transition-colors shadow-2xs"
           >
@@ -223,7 +247,7 @@ export const ResearchProjectView: React.FC<ResearchProjectViewProps> = ({
           {loading ? (
             <>
               <span className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-              <span>Coordinating Multi-Agent Pipeline...</span>
+              <span>Coordinating Multi-Agent Pipeline & Generating Paper Draft...</span>
             </>
           ) : (
             <>

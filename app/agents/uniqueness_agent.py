@@ -238,7 +238,7 @@ class TopicUniquenessAgent:
 
         elapsed_ms = round((time.perf_counter() - start_time) * 1000.0, 2)
 
-        return TopicUniquenessResponse(
+        resp = TopicUniquenessResponse(
             title=request.title,
             uniqueness_score=uniqueness_score,
             overlap_meter=overlap_meter,
@@ -252,6 +252,19 @@ class TopicUniquenessAgent:
             latency_ms=elapsed_ms,
             cache_hit=False,
         )
+
+        try:
+            from app.core.database import get_db_connection
+            conn = get_db_connection()
+            with conn:
+                conn.execute(
+                    "INSERT INTO uniqueness_runs (title, abstract, score, calibrated_rating, response_json) VALUES (?, ?, ?, ?, ?)",
+                    (request.title, request.abstract, uniqueness_score, calibrated_rating, resp.model_dump_json()),
+                )
+        except Exception as e:
+            logger.warning("Failed to persist uniqueness run to SQLite: %s", e)
+
+        return resp
 
 
 uniqueness_agent = TopicUniquenessAgent()
