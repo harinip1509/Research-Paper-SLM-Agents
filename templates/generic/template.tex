@@ -1,0 +1,50 @@
+\documentclass[11pt,a4paper]{article}
+
+\usepackage[margin=1in]{geometry}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{cite}
+\usepackage{microtype}
+
+\title{\textbf{ {{- title -}} }}
+
+\author{
+{% for author in authors %}
+  \textbf{ {{- author.name -}} } \\
+  \textit{ {{- author.institution | default("Department of Computer Science") -}} } \\
+  \texttt{ {{- author.email | default("author@institution.edu") -}} }
+  {% if not loop.last %} \and {% endif %}
+{% endfor %}
+}
+
+\date{\today}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+{{- abstract -}}
+\end{abstract}
+
+{% if keywords %}
+\noindent\textbf{Keywords:} {{- keywords | join(', ') -}}
+\vspace{1em}
+{% endif %}
+
+{% for section in sections %}
+\section{ {{- section.title -}} }
+{{ section.content }}
+{% endfor %}
+
+{% if ai_disclosure %}
+\section*{AI Assistance \& Methodology Disclosure}
+{{ ai_disclosure }}
+{% endif %}
+
+\bibliographystyle{plain}
+\bibliography{references}
+
+\end{document}

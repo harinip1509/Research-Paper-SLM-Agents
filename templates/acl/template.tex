@@ -1,0 +1,53 @@
+\documentclass[11pt,a4paper,twocolumn]{article}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=2.5cm]{geometry}
+\usepackage{times}
+\usepackage{latexsym}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{url}
+\usepackage{natbib}
+\usepackage{microtype}
+
+\title{ {{- title -}} }
+
+{% if is_anonymized %}
+\author{Anonymous ACL Submission}
+{% else %}
+\author{
+{% for author in authors %}
+  {{- author.name -}} \\
+  \texttt{ {{- author.email | default("author@institution.edu") -}} }
+  {% if not loop.last %} \and {% endif %}
+{% endfor %}
+}
+{% endif %}
+
+\date{}
+
+\begin{document}
+\maketitle
+
+\begin{abstract}
+{{- abstract -}}
+\end{abstract}
+
+{% if keywords %}
+\noindent\textbf{Keywords:} {{- keywords | join(', ') -}}
+\vspace{0.5em}
+{% endif %}
+
+{% for section in sections %}
+\section{ {{- section.title -}} }
+{{ section.content }}
+{% endfor %}
+
+{% if ai_disclosure %}
+\section*{Limitations \& AI-Use Statement}
+{{ ai_disclosure }}
+{% endif %}
+
+\bibliographystyle{acl_natbib}
+\bibliography{references}
+
+\end{document}

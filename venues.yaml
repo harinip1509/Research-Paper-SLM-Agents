@@ -1,0 +1,85 @@
+venues:
+  ieee:
+    id: "ieee"
+    name: "IEEE Conference"
+    full_name: "IEEE Conference Proceedings"
+    document_class: "IEEEtran"
+    layout: "two_column"
+    page_limit: 6
+    max_words: 4500
+    abstract_word_limit: 200
+    min_keywords: 3
+    max_keywords: 7
+    citation_style: "numeric"
+    anonymization_required: false
+    requires_ai_disclosure: true
+    template_file: "templates/ieee/template.tex"
+    description: "Standard double-column IEEE Transactions/Conference format."
+
+  acl:
+    id: "acl"
+    name: "ACL / EMNLP / NAACL"
+    full_name: "Association for Computational Linguistics"
+    document_class: "article"
+    layout: "two_column"
+    page_limit: 8
+    max_words: 5500
+    abstract_word_limit: 200
+    min_keywords: 3
+    max_keywords: 6
+    citation_style: "authoryear"
+    anonymization_required: true
+    requires_ai_disclosure: true
+    template_file: "templates/acl/template.tex"
+    description: "Official ACL conference format with mandatory anonymization and ethical considerations."
+
+  acm:
+    id: "acm"
+    name: "ACM SIGCONF"
+    full_name: "ACM International Conference Proceeding Series"
+    document_class: "acmart"
+    layout: "two_column"
+    page_limit: 9
+    max_words: 6500
+    abstract_word_limit: 250
+    min_keywords: 3
+    max_keywords: 8
+    citation_style: "numeric"
+    anonymization_required: true
+    requires_ai_disclosure: true
+    template_file: "templates/acm/template.tex"
+    description: "ACM SIG conference format (sigconf template)."
+
+  lncs:
+    id: "lncs"
+    name: "Springer LNCS"
+    full_name: "Lecture Notes in Computer Science"
+    document_class: "llncs"
+    layout: "single_column"
+    page_limit: 12
+    max_words: 5500
+    abstract_word_limit: 200
+    min_keywords: 3
+    max_keywords: 6
+    citation_style: "numeric"
+    anonymization_required: false
+    requires_ai_disclosure: false
+    template_file: "templates/lncs/template.tex"
+    description: "Springer LNCS single-column publication format."
+
+  generic:
+    id: "generic"
+    name: "Generic Preprint"
+    full_name: "Standard Academic Preprint Format"
+    document_class: "article"
+    layout: "single_column"
+    page_limit: 10
+    max_words: 7000
+    abstract_word_limit: 300
+    min_keywords: 2
+    max_keywords: 10
+    citation_style: "numeric"
+    anonymization_required: false
+    requires_ai_disclosure: true
+    template_file: "templates/generic/template.tex"
+    description: "Clean, portable single-column preprint format suitable for arXiv."

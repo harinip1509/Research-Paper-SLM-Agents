@@ -1,0 +1,53 @@
+\documentclass[runningheads]{llncs}
+
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb}
+\usepackage{booktabs}
+\usepackage{url}
+
+\begin{document}
+
+\title{ {{- title -}} }
+
+{% if is_anonymized %}
+\author{Anonymous Authors}
+\institute{Omitted for blind review}
+{% else %}
+\author{
+{% for author in authors %}
+  {{- author.name -}}
+  {% if not loop.last %}, {% endif %}
+{% endfor %}
+}
+\institute{
+{% for author in authors %}
+  {{- author.institution | default("Department of Computer Science") -}}
+  {% if not loop.last %} \\ {% endif %}
+{% endfor %}
+}
+{% endif %}
+
+\maketitle
+
+\begin{abstract}
+{{- abstract -}}
+
+{% if keywords %}
+\keywords{ {{- keywords | join(', ') -}} }
+{% endif %}
+\end{abstract}
+
+{% for section in sections %}
+\section{ {{- section.title -}} }
+{{ section.content }}
+{% endfor %}
+
+{% if ai_disclosure %}
+\section*{Author Disclosure Statement}
+{{ ai_disclosure }}
+{% endif %}
+
+\bibliographystyle{splncs04}
+\bibliography{references}
+
+\end{document}

@@ -1,0 +1,48 @@
+\documentclass[sigconf,nonacm]{acmart}
+
+\usepackage{booktabs}
+\usepackage{amsmath}
+\usepackage{microtype}
+
+\begin{document}
+
+\title{ {{- title -}} }
+
+{% if is_anonymized %}
+\author{Anonymous Author(s)}
+\affiliation{\institution{Affiliations omitted for blind review}\country{}}
+{% else %}
+{% for author in authors %}
+\author{ {{- author.name -}} }
+\affiliation{
+  \institution{ {{- author.institution | default("Research Institution") -}} }
+  \country{ {{- author.country | default("United States") -}} }
+}
+\email{ {{- author.email | default("author@institution.edu") -}} }
+{% endfor %}
+{% endif %}
+
+\begin{abstract}
+{{- abstract -}}
+\end{abstract}
+
+{% if keywords %}
+\keywords{ {{- keywords | join(', ') -}} }
+{% endif %}
+
+\maketitle
+
+{% for section in sections %}
+\section{ {{- section.title -}} }
+{{ section.content }}
+{% endfor %}
+
+{% if ai_disclosure %}
+\section*{ACM Policy on Generative AI Disclosure}
+{{ ai_disclosure }}
+{% endif %}
+
+\bibliographystyle{ACM-Reference-Format}
+\bibliography{references}
+
+\end{document}

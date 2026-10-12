@@ -1,0 +1,54 @@
+\documentclass[conference]{IEEEtran}
+\usepackage{cite}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
+\usepackage{graphicx}
+\usepackage{textcomp}
+\usepackage{xcolor}
+\usepackage{url}
+\usepackage{booktabs}
+
+\begin{document}
+
+\title{ {{- title -}} }
+
+{% if is_anonymized %}
+\author{\IEEEauthorblockN{Anonymous Authors}\IEEEauthorblockA{\textit{Affiliations omitted for blind review}}}
+{% else %}
+\author{
+{% for author in authors %}
+\IEEEauthorblockN{ {{- author.name -}} }
+\IEEEauthorblockA{\textit{ {{- author.affiliation | default("Department of Computer Science") -}} } \\
+\textit{ {{- author.institution | default("Research Institution") -}} } \\
+ {{- author.email | default("author@institution.edu") -}} }
+{% if not loop.last %} \and {% endif %}
+{% endfor %}
+}
+{% endif %}
+
+\maketitle
+
+\begin{abstract}
+{{- abstract -}}
+\end{abstract}
+
+{% if keywords %}
+\begin{IEEEkeywords}
+{{- keywords | join(', ') -}}
+\end{IEEEkeywords}
+{% endif %}
+
+{% for section in sections %}
+\section{ {{- section.title -}} }
+{{ section.content }}
+{% endfor %}
+
+{% if ai_disclosure %}
+\section*{AI Assistance Disclosure}
+{{ ai_disclosure }}
+{% endif %}
+
+\bibliographystyle{IEEEtran}
+\bibliography{references}
+
+\end{document}
