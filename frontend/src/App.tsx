@@ -8,6 +8,7 @@ import { FinalCheckView } from './components/FinalCheckView'
 import { FinalReportView } from './components/FinalReportView'
 import { LandingPage } from './components/LandingPage'
 import { AuthModal } from './components/AuthModal'
+import { SettingsModal } from './components/SettingsModal'
 import { apiGetMe, apiLogout, apiListProjects, apiGetProject, apiDeleteProject } from './api'
 import { User, Paper, PaperDraft, TopicUniquenessResponse, ProjectSummary } from './types'
 
@@ -18,6 +19,7 @@ export default function App() {
 
   const [authModalOpen, setAuthModalOpen] = useState(false)
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login')
+  const [settingsOpen, setSettingsOpen] = useState(false)
 
   // Shared Research State across 7 agents - Clean defaults (no hardcoding)
   const [projectId, setProjectId] = useState<string | null>(null)
@@ -168,6 +170,7 @@ export default function App() {
             onOpenAuth={handleOpenAuth}
             onLogout={handleLogout}
             onGoToLanding={() => setIsLanding(true)}
+            onOpenSettings={() => setSettingsOpen(true)}
           />
 
           {/* Main University-style Content Area */}
@@ -184,6 +187,7 @@ export default function App() {
                 onNewProject={handleNewProject}
                 onDeleteProject={handleDeleteProject}
                 onApplyPreset={handleApplyPreset}
+                onOpenSettings={() => setSettingsOpen(true)}
               />
             )}
 
@@ -253,6 +257,12 @@ export default function App() {
         initialMode={authMode}
         onClose={() => setAuthModalOpen(false)}
         onSuccess={handleAuthSuccess}
+      />
+
+      {/* Settings & API Keys Modal */}
+      <SettingsModal
+        isOpen={settingsOpen}
+        onClose={() => setSettingsOpen(false)}
       />
     </div>
   )

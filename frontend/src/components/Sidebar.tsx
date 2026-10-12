@@ -9,6 +9,7 @@ import {
   LogOut,
   User as UserIcon,
   LogIn,
+  Key,
 } from 'lucide-react'
 import { User } from '../types'
 
@@ -27,6 +28,7 @@ interface SidebarProps {
   onOpenAuth: (mode: 'login' | 'signup') => void
   onLogout: () => void
   onGoToLanding: () => void
+  onOpenSettings?: () => void
 }
 
 export const Sidebar: React.FC<SidebarProps> = ({
@@ -36,6 +38,7 @@ export const Sidebar: React.FC<SidebarProps> = ({
   onOpenAuth,
   onLogout,
   onGoToLanding,
+  onOpenSettings,
 }) => {
   const menuItems: { id: NavView; label: string; icon: React.FC<{ className?: string }> }[] = [
     { id: 'dashboard', label: 'Dashboard', icon: LayoutDashboard },
@@ -104,6 +107,21 @@ export const Sidebar: React.FC<SidebarProps> = ({
 
       {/* Footer / Auth */}
       <div className="p-4 border-t border-[#1a2d52]/60 space-y-3">
+        {onOpenSettings && (
+          <button
+            onClick={onOpenSettings}
+            className="w-full flex items-center justify-between px-3 py-2 rounded-lg text-xs font-medium text-slate-300 hover:bg-[#162a52] hover:text-white transition-colors border border-transparent hover:border-[#203a6b]"
+          >
+            <div className="flex items-center gap-2">
+              <Key className="w-3.5 h-3.5 text-amber-400" />
+              <span>API Keys & Database</span>
+            </div>
+            <span className="text-[10px] bg-slate-800 text-slate-400 px-1.5 py-0.5 rounded font-mono">
+              Config
+            </span>
+          </button>
+        )}
+
         {user ? (
           <div className="p-2.5 rounded-lg bg-[#162a52]/80 border border-[#203a6b] flex items-center justify-between">
             <div className="flex items-center gap-2 truncate">

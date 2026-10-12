@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { ArrowRight, Sparkles, BookOpen } from 'lucide-react'
+import { ArrowRight, Sparkles, BookOpen, Layers } from 'lucide-react'
 import { NavView } from './Sidebar'
 import { apiComputeUniqueness, apiDraftFullPaper, apiSaveProject } from '../api'
 import { Paper, TopicUniquenessResponse, PaperDraft } from '../types'
@@ -28,6 +28,7 @@ const PRESETS = [
       'We formulate parameterized quantum circuits for predicting non-covalent binding affinity and molecular docking conformations, evaluating variational ansatz architectures against classical baselines on the ChEMBL benchmark.',
     notes: 'Grounding in variational eigensolvers; evaluates binding energy and RMSD.',
     venue: 'ieee',
+    pages: 6,
   },
   {
     title: 'Transformer Models for Clinical NLP and EHR Summarization',
@@ -35,6 +36,7 @@ const PRESETS = [
       'We examine pre-trained transformer representations adapted for clinical narrative electronic health records, addressing domain terminology and tokenization bottlenecks.',
     notes: 'Compared on MIMIC-III benchmark; evaluates BioBERT and ClinicalBERT baselines.',
     venue: 'acl',
+    pages: 8,
   },
   {
     title: 'Differential Privacy in Federated Healthcare Optimization',
@@ -42,6 +44,7 @@ const PRESETS = [
       'A differential-privacy aware federated optimization framework across hospital silos, maintaining strict patient data confidentiality while achieving centralized AUC parity.',
     notes: 'Non-IID distribution across 5 synthetic hospital nodes; epsilon=1.2 DP guarantee.',
     venue: 'acm',
+    pages: 6,
   },
 ]
 
@@ -61,6 +64,7 @@ export const ResearchProjectView: React.FC<ResearchProjectViewProps> = ({
   setDraft,
   onProjectSaved,
 }) => {
+  const [targetPages, setTargetPages] = useState<number>(6)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
@@ -83,17 +87,18 @@ export const ResearchProjectView: React.FC<ResearchProjectViewProps> = ({
       setUniqueness(uRes)
       setPapers(uRes.recommended_papers)
 
-      // 2. Run Section Drafting (Agent 4)
+      // 2. Run Section Drafting (Agent 4) scaled to user-selected page length
       const dRes = await apiDraftFullPaper({
         title,
         abstract,
         venue,
         user_notes: userNotes,
         retrieved_papers: uRes.recommended_papers,
+        target_pages: targetPages,
       })
       setDraft(dRes)
 
-      // 3. Save project
+      // 3. Save project to SQLite DB
       try {
         const saved = await apiSaveProject({
           id: projectId || undefined,
@@ -126,6 +131,7 @@ export const ResearchProjectView: React.FC<ResearchProjectViewProps> = ({
     setAbstract(p.abstract)
     setUserNotes(p.notes)
     setVenue(p.venue)
+    setTargetPages(p.pages)
     setError(null)
   }
 
@@ -140,7 +146,7 @@ export const ResearchProjectView: React.FC<ResearchProjectViewProps> = ({
           Research Project Setup
         </h1>
         <p className="text-sm text-slate-500 mt-2 max-w-3xl leading-relaxed">
-          Define your research question, preliminary notes, and target conference format to launch the
+          Define your research question, preliminary notes, target page length, and conference venue to launch the
           autonomous multi-agent pipeline.
         </p>
       </div>
@@ -203,6 +209,56 @@ export const ResearchProjectView: React.FC<ResearchProjectViewProps> = ({
           />
         </div>
 
+        {/* Target Page Length Selector */}
+        <div>
+          <div className="flex items-center justify-between mb-2">
+            <label className="text-xs font-mono tracking-wider uppercase text-slate-500 font-semibold">
+              Target Paper Length: <span className="text-[#2563eb] font-bold">{targetPages} Pages</span> (~{(targetPages * 750).toLocaleString()} words)
+            </label>
+            <span className="text-[11px] font-mono text-slate-400">
+              ~{(targetPages * 750 / 5).toFixed(0)} words / section
+            </span>
+          </div>
+
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-3">
+            {[
+              { pages: 4, label: '4 Pages', sub: 'Workshop / Short Paper' },
+              { pages: 6, label: '6 Pages', sub: 'Standard Conference' },
+              { pages: 8, label: '8 Pages', sub: 'Full Conference Paper' },
+              { pages: 10, label: '10 Pages', sub: 'Extended / Journal' },
+            ].map((p) => (
+              <button
+                key={p.pages}
+                type="button"
+                onClick={() => setTargetPages(p.pages)}
+                className={`p-3 rounded-lg border text-left transition-all ${
+                  targetPages === p.pages
+                    ? 'border-[#2563eb] bg-blue-50/50 text-[#0f1f3d]'
+                    : 'border-[#e2e8f0] bg-white text-slate-600 hover:border-slate-300'
+                }`}
+              >
+                <div className="font-semibold text-xs font-mono">{p.label}</div>
+                <div className="text-[10px] text-slate-400 mt-0.5">{p.sub}</div>
+              </button>
+            ))}
+          </div>
+
+          <div className="flex items-center gap-4 px-2">
+            <input
+              type="range"
+              min={2}
+              max={12}
+              step={1}
+              value={targetPages}
+              onChange={(e) => setTargetPages(Number(e.target.value))}
+              className="flex-1 h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-[#2563eb]"
+            />
+            <span className="text-xs font-mono font-semibold text-slate-700 w-16 text-right">
+              {targetPages} Pages
+            </span>
+          </div>
+        </div>
+
         {/* Venue Profile Selection */}
         <div>
           <label className="block text-xs font-mono tracking-wider uppercase text-slate-500 font-semibold mb-2">
@@ -242,17 +298,17 @@ export const ResearchProjectView: React.FC<ResearchProjectViewProps> = ({
         <button
           onClick={handleLaunchWorkflow}
           disabled={loading}
-          className="w-full py-3 rounded-lg font-semibold text-xs text-white bg-[#0f1f3d] hover:bg-[#162a52] transition-colors flex items-center justify-center gap-2 shadow-sm disabled:opacity-50"
+          className="w-full py-3.5 rounded-lg font-semibold text-xs text-white bg-[#0f1f3d] hover:bg-[#162a52] transition-colors flex items-center justify-center gap-2 shadow-sm disabled:opacity-50"
         >
           {loading ? (
             <>
               <span className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
-              <span>Coordinating Multi-Agent Pipeline & Generating Paper Draft...</span>
+              <span>Synthesizing {targetPages}-Page Draft & Verifying Citations...</span>
             </>
           ) : (
             <>
               <Sparkles className="w-4 h-4 text-cyan-400" />
-              <span>Launch Literature Search & Paper Synthesis Pipeline</span>
+              <span>Launch Literature Search & Synthesize {targetPages}-Page Paper</span>
               <ArrowRight className="w-3.5 h-3.5 ml-1" />
             </>
           )}

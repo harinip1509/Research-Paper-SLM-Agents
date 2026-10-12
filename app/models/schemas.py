@@ -103,6 +103,7 @@ class PaperDraft(BaseModel):
     sections: List[PaperDraftSection]
     bibtex_content: str
     total_word_count: int
+    target_pages: Optional[int] = Field(default=6, description="User requested target page count")
 
 
 class ReviewCritique(BaseModel):
@@ -152,6 +153,7 @@ class FormatExportRequest(BaseModel):
     sections: List[Dict[str, str]]  # list of {title: ..., content: ...}
     bibtex: str
     ai_disclosure_statement: Optional[str] = None
+    target_pages: Optional[int] = 6
 
 
 class FormatConstraintViolation(BaseModel):
@@ -218,5 +220,21 @@ class ProjectSaveRequest(BaseModel):
     uniqueness: Optional[TopicUniquenessResponse] = None
     draft: Optional[PaperDraft] = None
     papers: Optional[List[Paper]] = []
+
+
+class SettingsKeysResponse(BaseModel):
+    groq_api_key_configured: bool
+    groq_api_key_masked: str
+    s2_api_key_configured: bool
+    s2_api_key_masked: str
+    db_path: str
+    db_connected: bool
+    groq_model_writing: str
+    groq_model_review: str
+
+
+class SettingsKeysUpdateRequest(BaseModel):
+    groq_api_key: Optional[str] = None
+    s2_api_key: Optional[str] = None
 
 

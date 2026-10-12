@@ -1,5 +1,5 @@
 import React from 'react'
-import { ArrowRight, BookOpen, Sparkles, FolderPlus, Clock, Trash2 } from 'lucide-react'
+import { ArrowRight, BookOpen, Sparkles, FolderPlus, Clock, Trash2, Key } from 'lucide-react'
 import { NavView } from './Sidebar'
 import { ProjectSummary } from '../types'
 
@@ -14,6 +14,7 @@ interface DashboardViewProps {
   onNewProject: () => void
   onDeleteProject?: (id: string) => void
   onApplyPreset: (preset: { title: string; abstract: string; notes: string; venue: string }) => void
+  onOpenSettings?: () => void
 }
 
 const TEMPLATES = [
@@ -65,17 +66,28 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   return (
     <div className="space-y-8 max-w-6xl mx-auto font-sans">
       {/* Header */}
-      <div>
-        <div className="text-[11px] font-mono tracking-widest text-[#2563eb] font-semibold uppercase mb-1.5">
-          ResearchFlow AI — Dashboard
+      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
+        <div>
+          <div className="text-[11px] font-mono tracking-widest text-[#2563eb] font-semibold uppercase mb-1.5">
+            ResearchFlow AI — Dashboard
+          </div>
+          <h1 className="text-3xl sm:text-4xl font-bold font-serif text-slate-900 tracking-tight">
+            Research Workflow
+          </h1>
+          <p className="text-sm text-slate-500 mt-2 max-w-3xl leading-relaxed">
+            A seven-stage pipeline where specialized AI agents work together to produce an original,
+            literature-supported conference paper draft.
+          </p>
         </div>
-        <h1 className="text-3xl sm:text-4xl font-bold font-serif text-slate-900 tracking-tight">
-          Research Workflow
-        </h1>
-        <p className="text-sm text-slate-500 mt-2 max-w-3xl leading-relaxed">
-          A seven-stage pipeline where specialized AI agents work together to produce an original,
-          literature-supported conference paper draft.
-        </p>
+        {onOpenSettings && (
+          <button
+            onClick={onOpenSettings}
+            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-2xs transition-all shrink-0 hover:border-slate-300"
+          >
+            <Key className="w-3.5 h-3.5 text-amber-500" />
+            <span>API Keys & DB</span>
+          </button>
+        )}
       </div>
 
       {/* Pipeline Overview */}

@@ -36,6 +36,10 @@ class SemanticScholarClient:
         self.timeout = timeout
         self.max_retries = max_retries
 
+    def set_api_key(self, api_key: str) -> None:
+        """Update Semantic Scholar API key dynamically."""
+        self.api_key = (api_key or "").strip()
+
     def _get_headers(self) -> Dict[str, str]:
         headers = {"User-Agent": "ScholarForge-Assistant/1.0"}
         if self.api_key and self.api_key.strip():

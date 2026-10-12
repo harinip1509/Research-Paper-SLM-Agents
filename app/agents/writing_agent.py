@@ -169,8 +169,9 @@ GUIDELINES:
         user_notes: str,
         verified_papers: List[Paper],
         section_titles: Optional[List[str]] = None,
+        target_pages: int = 6,
     ) -> PaperDraft:
-        """Draft complete conference paper section by section with verified BibTeX."""
+        """Draft complete conference paper section by section with verified BibTeX scaled to target pages."""
         sections_to_draft = section_titles or [
             "Introduction",
             "Related Work",
@@ -178,6 +179,12 @@ GUIDELINES:
             "Empirical Evaluation & Results",
             "Conclusion",
         ]
+
+        # Calculate word count budget based on user requested target page length
+        # Standard conference paper: ~750 words per single-column page or ~850 words per 2-column page
+        clamped_pages = max(2, min(14, target_pages))
+        total_target_budget = clamped_pages * 750
+        target_words_per_sec = max(450, total_target_budget // len(sections_to_draft))
 
         drafted_sections: List[PaperDraftSection] = []
         for sec_title in sections_to_draft:
@@ -187,6 +194,7 @@ GUIDELINES:
                 paper_abstract=paper_abstract,
                 user_notes=user_notes,
                 verified_papers=verified_papers,
+                target_words=target_words_per_sec,
             )
             drafted_sections.append(sec)
 
@@ -205,6 +213,7 @@ GUIDELINES:
             sections=drafted_sections,
             bibtex_content=bibtex_content,
             total_word_count=total_words,
+            target_pages=clamped_pages,
         )
 
 

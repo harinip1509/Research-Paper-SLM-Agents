@@ -136,6 +136,7 @@ export async function apiDraftFullPaper(params: {
   abstract?: string
   retrieved_papers?: Paper[]
   verified_papers?: Paper[]
+  target_pages?: number
 }): Promise<PaperDraft> {
   const payload = {
     paper_title: params.title,
@@ -146,6 +147,7 @@ export async function apiDraftFullPaper(params: {
     verified_papers: params.retrieved_papers || params.verified_papers || [],
     retrieved_papers: params.retrieved_papers || params.verified_papers || [],
     venue: params.venue,
+    target_pages: params.target_pages || 6,
   }
   const res = await fetch(`${API_BASE}/draft/full`, {
     method: 'POST',
@@ -221,7 +223,7 @@ export async function apiCheckConstraints(params: {
   return res.json()
 }
 
-export async function apiExportFormat(params: {
+export async function apiDownloadPdf(params: {
   venue_id: string
   title: string
   authors: any[]
@@ -230,17 +232,41 @@ export async function apiExportFormat(params: {
   sections: any[]
   bibtex: string
   ai_disclosure_statement?: string
-}): Promise<any> {
-  const res = await fetch(`${API_BASE}/format/export`, {
+  target_pages?: number
+}): Promise<Blob> {
+  const res = await fetch(`${API_BASE}/format/compile/pdf`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
     body: JSON.stringify(params),
   })
   if (!res.ok) {
-    const err = await res.json().catch(() => ({ detail: 'Export compilation failed' }))
-    throw new Error(parseErrorMessage(err, 'Export compilation failed'))
+    const err = await res.json().catch(() => ({ detail: 'PDF compilation failed' }))
+    throw new Error(parseErrorMessage(err, 'PDF compilation failed'))
   }
-  return res.json()
+  return res.blob()
+}
+
+export async function apiDownloadDocx(params: {
+  venue_id: string
+  title: string
+  authors: any[]
+  abstract: string
+  keywords: string[]
+  sections: any[]
+  bibtex: string
+  ai_disclosure_statement?: string
+  target_pages?: number
+}): Promise<Blob> {
+  const res = await fetch(`${API_BASE}/format/compile/docx`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
+    body: JSON.stringify(params),
+  })
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: 'DOCX generation failed' }))
+    throw new Error(parseErrorMessage(err, 'DOCX generation failed'))
+  }
+  return res.blob()
 }
 
 export async function apiListProjects(): Promise<ProjectSummary[]> {
@@ -288,5 +314,42 @@ export async function apiDeleteProject(id: string): Promise<void> {
     method: 'DELETE',
     headers: { ...getAuthHeader() },
   })
+}
+
+export interface SettingsKeysInfo {
+  groq_api_key_configured: boolean
+  groq_api_key_masked: string
+  s2_api_key_configured: boolean
+  s2_api_key_masked: string
+  db_path: string
+  db_connected: boolean
+  groq_model_writing: string
+  groq_model_review: string
+}
+
+export async function apiGetSettingsKeys(): Promise<SettingsKeysInfo> {
+  const res = await fetch(`${API_BASE}/settings/keys`, {
+    headers: { ...getAuthHeader() },
+  })
+  if (!res.ok) {
+    throw new Error('Failed to fetch settings')
+  }
+  return res.json()
+}
+
+export async function apiSaveSettingsKeys(data: {
+  groq_api_key?: string
+  s2_api_key?: string
+}): Promise<SettingsKeysInfo> {
+  const res = await fetch(`${API_BASE}/settings/keys`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
+    body: JSON.stringify(data),
+  })
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: 'Failed to update API keys' }))
+    throw new Error(parseErrorMessage(err, 'Failed to update API keys'))
+  }
+  return res.json()
 }
 

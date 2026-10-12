@@ -17,7 +17,9 @@ from app.agents.review_agent import review_agent
 from app.agents.similarity_agent import similarity_citation_agent
 from app.agents.uniqueness_agent import uniqueness_agent
 from app.agents.writing_agent import writing_agent
+from app.clients.groq_client import groq_client
 from app.clients.semantic_scholar import s2_client
+from app.config import ENV_FILE, settings
 from app.core.database import get_db_connection
 from app.models.schemas import (
     AuthResponse,
@@ -33,6 +35,8 @@ from app.models.schemas import (
     ProjectSaveRequest,
     ProjectSummary,
     ReviewCritique,
+    SettingsKeysResponse,
+    SettingsKeysUpdateRequest,
     SimilarityReport,
     TopicUniquenessRequest,
     TopicUniquenessResponse,
@@ -137,21 +141,24 @@ class DraftFullPaperRequest(BaseModel):
     retrieved_papers: List[Paper] = []
     section_titles: Optional[List[str]] = None
     venue: Optional[str] = None
+    target_pages: Optional[int] = 6
 
 
 @router.post("/draft/full", response_model=PaperDraft)
 async def draft_full_paper(req: DraftFullPaperRequest) -> PaperDraft:
-    """Draft full academic paper section-by-section with verified BibTeX."""
+    """Draft full academic paper section-by-section with verified BibTeX scaled to target pages."""
     try:
         t = req.paper_title or req.title or "Conference Paper Submission"
         a = req.paper_abstract or req.abstract or ""
         p = req.verified_papers or req.retrieved_papers or []
+        pages = req.target_pages or 6
         return await writing_agent.draft_full_paper(
             paper_title=t,
             paper_abstract=a,
             user_notes=req.user_notes,
             verified_papers=p,
             section_titles=req.section_titles,
+            target_pages=pages,
         )
     except Exception as e:
         logger.exception("Full paper drafting error: %s", e)
@@ -554,5 +561,84 @@ async def delete_project(project_id: str) -> Dict[str, str]:
     with conn:
         conn.execute("DELETE FROM projects WHERE id = ?", (project_id,))
     return {"message": "Project deleted successfully"}
+
+
+# =====================================================================
+# Settings & API Keys Management
+# =====================================================================
+
+def _mask_key(key: Optional[str]) -> str:
+    if not key or not key.strip():
+        return "Not Configured"
+    k = key.strip()
+    if k.startswith("mock-"):
+        return f"{k[:10]}... (mock)"
+    if len(k) <= 8:
+        return "********"
+    return f"{k[:4]}...{k[-4:]}"
+
+
+def _update_env_var(key: str, value: str) -> None:
+    content = ""
+    if ENV_FILE.exists():
+        content = ENV_FILE.read_text(encoding="utf-8")
+    lines = content.splitlines()
+    found = False
+    new_lines = []
+    for line in lines:
+        if line.startswith(f"{key}="):
+            new_lines.append(f"{key}={value}")
+            found = True
+        else:
+            new_lines.append(line)
+    if not found:
+        new_lines.append(f"{key}={value}")
+    ENV_FILE.write_text("\n".join(new_lines) + "\n", encoding="utf-8")
+
+
+@router.get("/settings/keys", response_model=SettingsKeysResponse)
+async def get_settings_keys() -> SettingsKeysResponse:
+    """Retrieve masked status of Groq and Semantic Scholar API keys and SQLite DB details."""
+    db_connected = False
+    try:
+        conn = get_db_connection()
+        conn.execute("SELECT 1").fetchone()
+        db_connected = True
+    except Exception:
+        db_connected = False
+
+    groq_configured = bool(settings.groq_api_key and not settings.groq_api_key.startswith("mock-"))
+    s2_configured = bool(settings.s2_api_key and settings.s2_api_key.strip())
+
+    return SettingsKeysResponse(
+        groq_api_key_configured=groq_configured,
+        groq_api_key_masked=_mask_key(settings.groq_api_key),
+        s2_api_key_configured=s2_configured,
+        s2_api_key_masked=_mask_key(settings.s2_api_key),
+        db_path=str(settings.db_path),
+        db_connected=db_connected,
+        groq_model_writing=settings.groq_model_writing,
+        groq_model_review=settings.groq_model_review,
+    )
+
+
+@router.post("/settings/keys", response_model=SettingsKeysResponse)
+async def update_settings_keys(req: SettingsKeysUpdateRequest) -> SettingsKeysResponse:
+    """Update Groq and/or Semantic Scholar API keys dynamically and persist to .env."""
+    if req.groq_api_key is not None:
+        new_groq = req.groq_api_key.strip()
+        settings.groq_api_key = new_groq
+        groq_client.set_api_key(new_groq)
+        _update_env_var("GROQ_API_KEY", new_groq)
+        logger.info("Updated GROQ_API_KEY (configured=%s)", bool(new_groq and not new_groq.startswith("mock-")))
+
+    if req.s2_api_key is not None:
+        new_s2 = req.s2_api_key.strip()
+        settings.s2_api_key = new_s2
+        s2_client.set_api_key(new_s2)
+        _update_env_var("S2_API_KEY", new_s2)
+        logger.info("Updated S2_API_KEY (configured=%s)", bool(new_s2))
+
+    return await get_settings_keys()
 
 

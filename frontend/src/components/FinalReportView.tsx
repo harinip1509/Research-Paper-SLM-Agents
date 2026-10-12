@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Download, FileText, FileCode, CheckCircle2, ArrowRight } from 'lucide-react'
 import { PaperDraft, TopicUniquenessResponse } from '../types'
-import { apiExportFormat } from '../api'
+import { apiDownloadPdf, apiDownloadDocx } from '../api'
 
 interface FinalReportViewProps {
   title: string
@@ -68,9 +68,6 @@ export const FinalReportView: React.FC<FinalReportViewProps> = ({
   const wordCount = draft.total_word_count
   const sectionCount = draft.sections.length
   const refCount = draft.bibtex_entries?.length || 0
-  const originalityStr = uniqueness
-    ? (uniqueness.uniqueness_score / 100).toFixed(3)
-    : '—'
 
   const handleExport = async (type: 'pdf' | 'docx') => {
     if (type === 'pdf') setLoadingPdf(true)
@@ -83,7 +80,7 @@ export const FinalReportView: React.FC<FinalReportViewProps> = ({
         content: s.latex_content,
       }))
 
-      const res = await apiExportFormat({
+      const payload = {
         venue_id: venue || 'ieee',
         title: paperTitle,
         authors: [
@@ -97,17 +94,34 @@ export const FinalReportView: React.FC<FinalReportViewProps> = ({
         keywords: ['Machine Learning', 'Natural Language Processing', 'Multi-Agent Systems'],
         sections: sectionsData,
         bibtex: draft.bibtex_entries?.join('\n\n') || '',
-      })
+        target_pages: draft.target_pages || 6,
+      }
 
       if (type === 'pdf') {
-        window.open(res.pdf_download_url, '_blank')
-        setToast('PDF compiled and downloaded!')
+        const blob = await apiDownloadPdf(payload)
+        const url = window.URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `paper_${venue || 'ieee'}.pdf`
+        document.body.appendChild(a)
+        a.click()
+        window.URL.revokeObjectURL(url)
+        a.remove()
+        setToast('PDF compiled and downloaded successfully!')
       } else {
-        window.open(res.docx_download_url, '_blank')
-        setToast('DOCX generated and downloaded!')
+        const blob = await apiDownloadDocx(payload)
+        const url = window.URL.createObjectURL(blob)
+        const a = document.createElement('a')
+        a.href = url
+        a.download = `paper_${venue || 'ieee'}.docx`
+        document.body.appendChild(a)
+        a.click()
+        window.URL.revokeObjectURL(url)
+        a.remove()
+        setToast('DOCX generated and downloaded successfully!')
       }
     } catch (e: any) {
-      setToast('Export generated using deterministic template.')
+      setToast(e.message || 'Export generation failed.')
     } finally {
       setLoadingPdf(false)
       setLoadingDocx(false)

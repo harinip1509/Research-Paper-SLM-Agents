@@ -68,3 +68,25 @@ async def test_projects_crud_endpoints():
         del_resp = await client.delete(f"/api/projects/{project_id}")
         assert del_resp.status_code == 200
 
+
+@pytest.mark.asyncio
+async def test_settings_keys_endpoints():
+    async with AsyncClient(transport=ASGITransport(app=app), base_url="http://test") as client:
+        # GET settings keys
+        resp = await client.get("/api/settings/keys")
+        assert resp.status_code == 200
+        data = resp.json()
+        assert "groq_api_key_configured" in data
+        assert "s2_api_key_configured" in data
+        assert "db_path" in data
+        assert data["db_connected"] is True
+
+        # POST settings keys update
+        post_resp = await client.post(
+            "/api/settings/keys",
+            json={"groq_api_key": "mock-test-key-updated", "s2_api_key": "s2-test-token-123"},
+        )
+        assert post_resp.status_code == 200
+        updated = post_resp.json()
+        assert updated["s2_api_key_configured"] is True
+
