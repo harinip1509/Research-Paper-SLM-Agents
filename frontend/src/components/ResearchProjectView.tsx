@@ -82,6 +82,7 @@ export const ResearchProjectView: React.FC<ResearchProjectViewProps> = ({
       // 2. Run Section Drafting (Agent 4)
       const dRes = await apiDraftFullPaper({
         title,
+        abstract,
         venue,
         user_notes: userNotes,
         retrieved_papers: uRes.recommended_papers,

@@ -13,9 +13,10 @@ import {
   ExternalLink,
 } from 'lucide-react'
 import { apiComputeUniqueness } from '../api'
-import { TopicUniquenessResponse } from '../types'
+import { TopicUniquenessResponse, User } from '../types'
 
 interface LandingPageProps {
+  user: User | null
   onStart: () => void
   onOpenAuth: (mode: 'login' | 'signup') => void
 }
@@ -41,7 +42,14 @@ const PRESETS = [
   },
 ]
 
-export const LandingPage: React.FC<LandingPageProps> = ({ onStart, onOpenAuth }) => {
+export const LandingPage: React.FC<LandingPageProps> = ({ user, onStart, onOpenAuth }) => {
+  const handleStartWorkflow = () => {
+    if (user) {
+      onStart()
+    } else {
+      onOpenAuth('login')
+    }
+  }
   const [selectedPreset, setSelectedPreset] = useState(0)
   const [demoTitle, setDemoTitle] = useState(PRESETS[0].title)
   const [demoAbstract, setDemoAbstract] = useState(PRESETS[0].abstract)
@@ -100,7 +108,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart, onOpenAuth })
               Sign In
             </button>
             <button
-              onClick={onStart}
+              onClick={handleStartWorkflow}
               className="px-4 py-2 rounded-lg text-xs font-semibold text-white bg-[#0f1f3d] hover:bg-[#162a52] transition-colors flex items-center gap-1.5 shadow-sm"
             >
               <span>Launch Platform</span>
@@ -129,7 +137,7 @@ export const LandingPage: React.FC<LandingPageProps> = ({ onStart, onOpenAuth })
 
           <div className="pt-2 flex flex-wrap items-center justify-center gap-3">
             <button
-              onClick={onStart}
+              onClick={handleStartWorkflow}
               className="px-6 py-3 rounded-lg text-xs font-semibold text-white bg-[#0f1f3d] hover:bg-[#162a52] transition-colors flex items-center gap-2 shadow-sm"
             >
               <span>Open Research Dashboard</span>

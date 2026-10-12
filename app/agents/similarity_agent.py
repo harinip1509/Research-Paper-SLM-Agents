@@ -7,7 +7,7 @@ from __future__ import annotations
 
 import logging
 import re
-from typing import Dict, List, Set, Tuple
+from typing import Dict, List, Optional, Set, Tuple
 
 import numpy as np
 
@@ -44,8 +44,10 @@ class SimilarityCitationAgent:
         self,
         draft_text: str,
         retrieved_papers: List[Paper],
+        threshold: Optional[float] = None,
     ) -> SimilarityReport:
         """Check sentence-level overlap against source paper abstracts to prevent verbatim borrowing."""
+        effective_threshold = threshold if threshold is not None else self.sentence_overlap_threshold
         draft_sentences = split_into_sentences(draft_text)
         if not draft_sentences or not retrieved_papers:
             return SimilarityReport(
@@ -98,7 +100,7 @@ class SimilarityCitationAgent:
             if best_sim > max_overlap:
                 max_overlap = best_sim
 
-            if best_sim >= self.sentence_overlap_threshold:
+            if best_sim >= effective_threshold:
                 source_sent, matched_paper = source_tuples[best_idx]
                 matches.append(
                     SentenceOverlapMatch(
@@ -110,7 +112,7 @@ class SimilarityCitationAgent:
                     )
                 )
 
-        is_flagged = len(matches) > 0 or max_overlap >= self.sentence_overlap_threshold
+        is_flagged = len(matches) > 0 or max_overlap >= effective_threshold
 
         return SimilarityReport(
             max_sentence_overlap=round(max_overlap, 4),

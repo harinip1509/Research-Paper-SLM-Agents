@@ -6,7 +6,7 @@ import {
   PaperDraft,
   ReviewCritique,
   SimilarityReport,
-  FormatConstraintReport
+  FormatConstraintReport,
 } from './types'
 
 const API_BASE = '/api'
@@ -16,7 +16,33 @@ function getAuthHeader(): Record<string, string> {
   return token ? { Authorization: `Bearer ${token}` } : {}
 }
 
-export async function apiSignup(data: { name: string; email: string; password: string; institution?: string }): Promise<{ user: User; token: string }> {
+export function parseErrorMessage(err: any, fallback: string): string {
+  if (!err) return fallback
+  if (typeof err === 'string') return err
+  if (typeof err.detail === 'string') return err.detail
+  if (Array.isArray(err.detail)) {
+    return err.detail
+      .map((d: any) => {
+        if (typeof d === 'string') return d
+        if (d && typeof d === 'object') {
+          const field = Array.isArray(d.loc) ? d.loc.slice(-1)[0] : ''
+          const msg = d.msg || d.message || JSON.stringify(d)
+          return field ? `${field}: ${msg}` : msg
+        }
+        return String(d)
+      })
+      .join('; ')
+  }
+  if (typeof err.message === 'string') return err.message
+  return fallback
+}
+
+export async function apiSignup(data: {
+  name: string
+  email: string
+  password: string
+  institution?: string
+}): Promise<{ user: User; token: string }> {
   const res = await fetch(`${API_BASE}/auth/signup`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -24,12 +50,15 @@ export async function apiSignup(data: { name: string; email: string; password: s
   })
   if (!res.ok) {
     const err = await res.json().catch(() => ({ detail: 'Signup failed' }))
-    throw new Error(err.detail || 'Signup failed')
+    throw new Error(parseErrorMessage(err, 'Signup failed'))
   }
   return res.json()
 }
 
-export async function apiLogin(data: { email: string; password: string }): Promise<{ user: User; token: string }> {
+export async function apiLogin(data: {
+  email: string
+  password: string
+}): Promise<{ user: User; token: string }> {
   const res = await fetch(`${API_BASE}/auth/login`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
@@ -37,7 +66,7 @@ export async function apiLogin(data: { email: string; password: string }): Promi
   })
   if (!res.ok) {
     const err = await res.json().catch(() => ({ detail: 'Invalid credentials' }))
-    throw new Error(err.detail || 'Invalid credentials')
+    throw new Error(parseErrorMessage(err, 'Invalid credentials'))
   }
   return res.json()
 }
@@ -76,7 +105,7 @@ export async function apiComputeUniqueness(params: {
   })
   if (!res.ok) {
     const err = await res.json().catch(() => ({ detail: 'Uniqueness scoring failed' }))
-    throw new Error(err.detail || 'Uniqueness scoring failed')
+    throw new Error(parseErrorMessage(err, 'Uniqueness scoring failed'))
   }
   return res.json()
 }
@@ -94,7 +123,7 @@ export async function apiGeneratePlan(params: {
   })
   if (!res.ok) {
     const err = await res.json().catch(() => ({ detail: 'Planning generation failed' }))
-    throw new Error(err.detail || 'Planning generation failed')
+    throw new Error(parseErrorMessage(err, 'Planning generation failed'))
   }
   return res.json()
 }
@@ -103,16 +132,28 @@ export async function apiDraftFullPaper(params: {
   title: string
   venue: string
   user_notes: string
-  retrieved_papers: Paper[]
+  abstract?: string
+  retrieved_papers?: Paper[]
+  verified_papers?: Paper[]
 }): Promise<PaperDraft> {
+  const payload = {
+    paper_title: params.title,
+    title: params.title,
+    paper_abstract: params.abstract || '',
+    abstract: params.abstract || '',
+    user_notes: params.user_notes || '',
+    verified_papers: params.retrieved_papers || params.verified_papers || [],
+    retrieved_papers: params.retrieved_papers || params.verified_papers || [],
+    venue: params.venue,
+  }
   const res = await fetch(`${API_BASE}/draft/full`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
-    body: JSON.stringify(params),
+    body: JSON.stringify(payload),
   })
   if (!res.ok) {
     const err = await res.json().catch(() => ({ detail: 'Drafting failed' }))
-    throw new Error(err.detail || 'Drafting failed')
+    throw new Error(parseErrorMessage(err, 'Drafting failed'))
   }
   return res.json()
 }
@@ -130,7 +171,7 @@ export async function apiReviewDraft(params: {
   })
   if (!res.ok) {
     const err = await res.json().catch(() => ({ detail: 'Review failed' }))
-    throw new Error(err.detail || 'Review failed')
+    throw new Error(parseErrorMessage(err, 'Review failed'))
   }
   return res.json()
 }
@@ -146,7 +187,7 @@ export async function apiCheckSimilarity(params: {
   })
   if (!res.ok) {
     const err = await res.json().catch(() => ({ detail: 'Similarity check failed' }))
-    throw new Error(err.detail || 'Similarity check failed')
+    throw new Error(parseErrorMessage(err, 'Similarity check failed'))
   }
   return res.json()
 }
@@ -174,7 +215,7 @@ export async function apiCheckConstraints(params: {
   })
   if (!res.ok) {
     const err = await res.json().catch(() => ({ detail: 'Constraint check failed' }))
-    throw new Error(err.detail || 'Constraint check failed')
+    throw new Error(parseErrorMessage(err, 'Constraint check failed'))
   }
   return res.json()
 }
@@ -196,7 +237,7 @@ export async function apiExportFormat(params: {
   })
   if (!res.ok) {
     const err = await res.json().catch(() => ({ detail: 'Export compilation failed' }))
-    throw new Error(err.detail || 'Export compilation failed')
+    throw new Error(parseErrorMessage(err, 'Export compilation failed'))
   }
   return res.json()
 }

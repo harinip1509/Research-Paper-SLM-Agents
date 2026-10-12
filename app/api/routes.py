@@ -92,10 +92,13 @@ async def get_paper_recommendations(
 
 class DraftSectionRequest(BaseModel):
     section_title: str
-    paper_title: str
-    paper_abstract: str
+    paper_title: Optional[str] = None
+    title: Optional[str] = None
+    paper_abstract: Optional[str] = None
+    abstract: Optional[str] = None
     user_notes: str = ""
     verified_papers: List[Paper] = []
+    retrieved_papers: List[Paper] = []
     target_words: int = 600
 
 
@@ -103,12 +106,15 @@ class DraftSectionRequest(BaseModel):
 async def draft_section(req: DraftSectionRequest) -> PaperDraftSection:
     """Draft an individual paper section grounded only in user notes and verified literature."""
     try:
+        t = req.paper_title or req.title or "Conference Paper Submission"
+        a = req.paper_abstract or req.abstract or ""
+        p = req.verified_papers or req.retrieved_papers or []
         return await writing_agent.draft_section(
             section_title=req.section_title,
-            paper_title=req.paper_title,
-            paper_abstract=req.paper_abstract,
+            paper_title=t,
+            paper_abstract=a,
             user_notes=req.user_notes,
-            verified_papers=req.verified_papers,
+            verified_papers=p,
             target_words=req.target_words,
         )
     except Exception as e:
@@ -117,22 +123,29 @@ async def draft_section(req: DraftSectionRequest) -> PaperDraftSection:
 
 
 class DraftFullPaperRequest(BaseModel):
-    paper_title: str
-    paper_abstract: str
+    paper_title: Optional[str] = None
+    title: Optional[str] = None
+    paper_abstract: Optional[str] = None
+    abstract: Optional[str] = None
     user_notes: str = ""
     verified_papers: List[Paper] = []
+    retrieved_papers: List[Paper] = []
     section_titles: Optional[List[str]] = None
+    venue: Optional[str] = None
 
 
 @router.post("/draft/full", response_model=PaperDraft)
 async def draft_full_paper(req: DraftFullPaperRequest) -> PaperDraft:
     """Draft full academic paper section-by-section with verified BibTeX."""
     try:
+        t = req.paper_title or req.title or "Conference Paper Submission"
+        a = req.paper_abstract or req.abstract or ""
+        p = req.verified_papers or req.retrieved_papers or []
         return await writing_agent.draft_full_paper(
-            paper_title=req.paper_title,
-            paper_abstract=req.paper_abstract,
+            paper_title=t,
+            paper_abstract=a,
             user_notes=req.user_notes,
-            verified_papers=req.verified_papers,
+            verified_papers=p,
             section_titles=req.section_titles,
         )
     except Exception as e:
@@ -274,9 +287,12 @@ async def generate_paper_plan(req: PlanRequest) -> PaperPlan:
 
 
 class ReviewRequest(BaseModel):
-    paper_title: str
-    paper_abstract: str
-    sections: List[Dict[str, str]]
+    paper_title: Optional[str] = None
+    title: Optional[str] = None
+    paper_abstract: Optional[str] = None
+    abstract: Optional[str] = None
+    sections: Optional[List[Dict[str, str]]] = None
+    draft_text: Optional[str] = None
     cited_papers: List[Paper] = []
     target_venue: str = "ieee"
 
@@ -285,10 +301,13 @@ class ReviewRequest(BaseModel):
 async def review_paper(req: ReviewRequest) -> ReviewCritique:
     """Perform multi-criteria rubric peer critique."""
     try:
+        t = req.paper_title or req.title or "Conference Paper Submission"
+        a = req.paper_abstract or req.abstract or ""
+        secs = req.sections or [{"title": "Main Draft", "content": req.draft_text or ""}]
         return await review_agent.review_paper(
-            paper_title=req.paper_title,
-            paper_abstract=req.paper_abstract,
-            sections=req.sections,
+            paper_title=t,
+            paper_abstract=a,
+            sections=secs,
             cited_papers=req.cited_papers,
             target_venue=req.target_venue,
         )

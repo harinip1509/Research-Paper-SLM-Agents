@@ -13,7 +13,7 @@ import { User, Paper, PaperDraft, TopicUniquenessResponse } from './types'
 
 export default function App() {
   const [user, setUser] = useState<User | null>(null)
-  const [isLanding, setIsLanding] = useState(false)
+  const [isLanding, setIsLanding] = useState(true)
   const [currentNav, setCurrentNav] = useState<NavView>('dashboard')
 
   const [authModalOpen, setAuthModalOpen] = useState(false)
@@ -36,7 +36,9 @@ export default function App() {
 
   useEffect(() => {
     apiGetMe().then((u) => {
-      if (u) setUser(u)
+      if (u) {
+        setUser(u)
+      }
     })
   }, [])
 
@@ -53,6 +55,7 @@ export default function App() {
   const handleLogout = async () => {
     await apiLogout()
     setUser(null)
+    setIsLanding(true)
   }
 
   const stageNames: Record<NavView, string> = {
@@ -68,6 +71,7 @@ export default function App() {
     <div className="min-h-screen bg-[#f8fafc] text-slate-900 font-sans flex flex-col">
       {isLanding ? (
         <LandingPage
+          user={user}
           onStart={() => setIsLanding(false)}
           onOpenAuth={handleOpenAuth}
         />
