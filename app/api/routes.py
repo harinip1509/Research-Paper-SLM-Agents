@@ -1,4 +1,4 @@
-"""FastAPI API routes for ScholarForge."""
+"""FastAPI API routes for ScholarForge covering all 7 specialized agents."""
 from __future__ import annotations
 
 import logging
@@ -10,10 +10,14 @@ from pydantic import BaseModel
 
 from app.agents.formatting_agent import formatting_agent
 from app.agents.literature_agent import literature_agent
+from app.agents.planning_agent import planning_agent
+from app.agents.review_agent import review_agent
+from app.agents.similarity_agent import similarity_citation_agent
 from app.agents.uniqueness_agent import uniqueness_agent
 from app.agents.writing_agent import writing_agent
 from app.clients.semantic_scholar import s2_client
 from app.models.schemas import (
+    CitationVerificationResult,
     FormatConstraintReport,
     FormatExportRequest,
     LiteratureExtractRequest,
@@ -21,6 +25,9 @@ from app.models.schemas import (
     Paper,
     PaperDraft,
     PaperDraftSection,
+    PaperPlan,
+    ReviewCritique,
+    SimilarityReport,
     TopicUniquenessRequest,
     TopicUniquenessResponse,
 )
@@ -31,7 +38,7 @@ router = APIRouter(prefix="/api", tags=["ScholarForge"])
 
 
 # =====================================================================
-# Milestone 1: Topic Uniqueness & Search
+# Milestone 1: Topic Uniqueness & Search (Agent 1)
 # =====================================================================
 
 @router.post("/uniqueness", response_model=TopicUniquenessResponse)
@@ -75,7 +82,7 @@ async def get_paper_recommendations(
 
 
 # =====================================================================
-# Milestone 2: Writing & Multi-Venue Formatting
+# Milestone 2: Writing & Multi-Venue Formatting (Agents 4 & 7)
 # =====================================================================
 
 class DraftSectionRequest(BaseModel):
@@ -222,7 +229,7 @@ async def condense_section(req: CondenseRequest) -> Dict[str, Any]:
 
 
 # =====================================================================
-# Milestone 3: Literature Aspect Summarizer
+# Milestone 3: Literature Aspect Summarizer (Agent 2)
 # =====================================================================
 
 @router.post("/literature/extract", response_model=LiteratureExtractResponse)
@@ -233,3 +240,89 @@ async def extract_literature_aspects(req: LiteratureExtractRequest) -> Literatur
     except Exception as e:
         logger.exception("Aspect extraction error: %s", e)
         raise HTTPException(status_code=500, detail=f"Aspect extraction failed: {str(e)}")
+
+
+# =====================================================================
+# Milestone 4: Planning, Review, and Citation Verification (Agents 3, 5, 6)
+# =====================================================================
+
+class PlanRequest(BaseModel):
+    paper_title: str
+    research_goals: List[str] = []
+    user_notes: str = ""
+    target_venue: str = "ieee"
+
+
+@router.post("/plan", response_model=PaperPlan)
+async def generate_paper_plan(req: PlanRequest) -> PaperPlan:
+    """Decompose-then-plan: generate requirements checklist and map paper sections."""
+    try:
+        return await planning_agent.generate_plan(
+            paper_title=req.paper_title,
+            research_goals=req.research_goals,
+            user_notes=req.user_notes,
+            target_venue=req.target_venue,
+        )
+    except Exception as e:
+        logger.exception("Planning Agent error: %s", e)
+        raise HTTPException(status_code=500, detail=f"Paper planning failed: {str(e)}")
+
+
+class ReviewRequest(BaseModel):
+    paper_title: str
+    paper_abstract: str
+    sections: List[Dict[str, str]]
+    cited_papers: List[Paper] = []
+    target_venue: str = "ieee"
+
+
+@router.post("/review", response_model=ReviewCritique)
+async def review_paper(req: ReviewRequest) -> ReviewCritique:
+    """Perform multi-criteria rubric peer critique."""
+    try:
+        return await review_agent.review_paper(
+            paper_title=req.paper_title,
+            paper_abstract=req.paper_abstract,
+            sections=req.sections,
+            cited_papers=req.cited_papers,
+            target_venue=req.target_venue,
+        )
+    except Exception as e:
+        logger.exception("Review Agent error: %s", e)
+        raise HTTPException(status_code=500, detail=f"Review failed: {str(e)}")
+
+
+class SentenceOverlapRequest(BaseModel):
+    draft_text: str
+    retrieved_papers: List[Paper] = []
+
+
+@router.post("/similarity/sentence", response_model=SimilarityReport)
+async def check_sentence_similarity(req: SentenceOverlapRequest) -> SimilarityReport:
+    """Perform sentence-level overlap checks against retrieved abstracts."""
+    try:
+        return similarity_citation_agent.check_sentence_overlap(
+            draft_text=req.draft_text,
+            retrieved_papers=req.retrieved_papers,
+        )
+    except Exception as e:
+        logger.exception("Similarity check error: %s", e)
+        raise HTTPException(status_code=500, detail=f"Similarity check failed: {str(e)}")
+
+
+class CitationVerifyRequest(BaseModel):
+    draft_text: str
+    known_papers: List[Paper] = []
+
+
+@router.post("/citations/verify", response_model=List[CitationVerificationResult])
+async def verify_citations(req: CitationVerifyRequest) -> List[CitationVerificationResult]:
+    """Verify all cite keys in draft against Semantic Scholar Graph API metadata."""
+    try:
+        return await similarity_citation_agent.verify_citations(
+            draft_text=req.draft_text,
+            known_papers=req.known_papers,
+        )
+    except Exception as e:
+        logger.exception("Citation verify error: %s", e)
+        raise HTTPException(status_code=500, detail=f"Citation verification failed: {str(e)}")
