@@ -170,3 +170,29 @@ class FormatConstraintReport(BaseModel):
     word_count: int
     abstract_words: int
     estimated_pages: float
+
+
+class UserSignupRequest(BaseModel):
+    name: str
+    email: str
+    password: str
+    institution: Optional[str] = ""
+
+
+class UserLoginRequest(BaseModel):
+    email: str
+    password: str
+
+
+class UserProfile(BaseModel):
+    id: str
+    name: str
+    email: str
+    institution: Optional[str] = ""
+
+
+class AuthResponse(BaseModel):
+    user: UserProfile
+    token: str
+    message: Optional[str] = "Success"
+

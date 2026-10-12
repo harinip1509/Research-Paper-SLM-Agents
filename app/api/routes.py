@@ -4,7 +4,7 @@ from __future__ import annotations
 import logging
 from typing import Any, Dict, List, Optional
 
-from fastapi import APIRouter, HTTPException, Query
+from fastapi import APIRouter, Header, HTTPException, Query
 from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
@@ -17,6 +17,7 @@ from app.agents.uniqueness_agent import uniqueness_agent
 from app.agents.writing_agent import writing_agent
 from app.clients.semantic_scholar import s2_client
 from app.models.schemas import (
+    AuthResponse,
     CitationVerificationResult,
     FormatConstraintReport,
     FormatExportRequest,
@@ -30,7 +31,11 @@ from app.models.schemas import (
     SimilarityReport,
     TopicUniquenessRequest,
     TopicUniquenessResponse,
+    UserLoginRequest,
+    UserProfile,
+    UserSignupRequest,
 )
+from app.services.auth_service import auth_service
 
 logger = logging.getLogger(__name__)
 
@@ -320,9 +325,71 @@ async def verify_citations(req: CitationVerifyRequest) -> List[CitationVerificat
     """Verify all cite keys in draft against Semantic Scholar Graph API metadata."""
     try:
         return await similarity_citation_agent.verify_citations(
-            draft_text=req.draft_text,
-            known_papers=req.known_papers,
-        )
+             draft_text=req.draft_text,
+             known_papers=req.known_papers,
+         )
     except Exception as e:
         logger.exception("Citation verify error: %s", e)
         raise HTTPException(status_code=500, detail=f"Citation verification failed: {str(e)}")
+
+
+# =====================================================================
+# Authentication & User Management
+# =====================================================================
+
+@router.post("/auth/signup", response_model=AuthResponse)
+async def auth_signup(req: UserSignupRequest) -> AuthResponse:
+    """Register a new researcher account."""
+    try:
+        user_data, token = auth_service.signup(
+            name=req.name,
+            email=req.email,
+            password=req.password,
+            institution=req.institution,
+        )
+        return AuthResponse(
+            user=UserProfile(**user_data),
+            token=token,
+            message="Account created successfully",
+        )
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        logger.exception("Signup error: %s", e)
+        raise HTTPException(status_code=500, detail="Failed to create account")
+
+
+@router.post("/auth/login", response_model=AuthResponse)
+async def auth_login(req: UserLoginRequest) -> AuthResponse:
+    """Authenticate researcher and return session token."""
+    res = auth_service.login(email=req.email, password=req.password)
+    if not res:
+        raise HTTPException(status_code=401, detail="Invalid email or password")
+    user_data, token = res
+    return AuthResponse(
+        user=UserProfile(**user_data),
+        token=token,
+        message="Login successful",
+    )
+
+
+@router.get("/auth/me", response_model=UserProfile)
+async def auth_me(authorization: Optional[str] = Header(None)) -> UserProfile:
+    """Get current authenticated user profile."""
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=401, detail="Missing or invalid authentication token")
+    token = authorization.split("Bearer ", 1)[1].strip()
+    user = auth_service.get_user_by_token(token)
+    if not user:
+        raise HTTPException(status_code=401, detail="Session expired or invalid")
+    return UserProfile(**user)
+
+
+@router.post("/auth/logout")
+async def auth_logout(authorization: Optional[str] = Header(None)) -> Dict[str, str]:
+    """Logout current session."""
+    if authorization and authorization.startswith("Bearer "):
+        token = authorization.split("Bearer ", 1)[1].strip()
+        auth_service.logout(token)
+    return {"message": "Logged out successfully"}
+
