@@ -1,0 +1,18 @@
+[project]
+name = "scholarforge"
+version = "0.1.0"
+description = "Multi-agent assistant for writing conference papers with Topic Uniqueness scoring and multi-venue export."
+requires-python = ">=3.11"
+
+[tool.ruff]
+target-version = "py311"
+line-length = 100
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I"]
+ignore = ["E501"]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["tests"]
+asyncio_mode = "auto"

@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>ScholarForge — Multi-Agent Conference Paper Assistant</title>
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+    body { font-family: 'Inter', sans-serif; }
+    code, pre { font-family: 'JetBrains Mono', monospace; }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen">
+  <!-- Top Navigation -->
+  <header class="border-b border-slate-800 bg-slate-900/60 backdrop-blur sticky top-0 z-50">
+    <div class="max-w-7xl mx-auto px-6 h-16 flex items-center justify-between">
+      <div class="flex items-center space-x-3">
+        <div class="h-9 w-9 rounded-lg bg-indigo-600 flex items-center justify-center font-bold text-white shadow-lg shadow-indigo-500/20">
+          SF
+        </div>
+        <div>
+          <h1 class="font-bold text-lg text-white leading-tight">ScholarForge</h1>
+          <p class="text-xs text-slate-400">Multi-Agent Conference Paper Assistant</p>
+        </div>
+      </div>
+      <div class="flex items-center space-x-4">
+        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium bg-emerald-950 text-emerald-400 border border-emerald-800">
+          <span class="w-1.5 h-1.5 rounded-full bg-emerald-400 mr-1.5 animate-pulse"></span> M1 MVP Active
+        </span>
+        <a href="/docs" target="_blank" class="text-xs text-slate-400 hover:text-slate-200 transition">API Docs</a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Main Container -->
+  <main class="max-w-7xl mx-auto px-6 py-8">
+    <!-- Hero / Headline -->
+    <div class="mb-8">
+      <h2 class="text-2xl font-bold tracking-tight text-white sm:text-3xl">Topic Uniqueness & Literature Overlap Analyzer</h2>
+      <p class="mt-2 text-sm text-slate-400 max-w-3xl">
+        Evaluates empirical topic uniqueness against peer-reviewed literature using hybrid dense retrieval (BGE-small + FAISS) and Semantic Scholar Graph recommendations. Calibrated against RINoBench human novelty annotations.
+      </p>
+    </div>
+
+    <!-- 2-Column Layout -->
+    <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+      <!-- Left Column: Input Form -->
+      <div class="lg:col-span-5 space-y-6">
+        <div class="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-xl">
+          <h3 class="text-base font-semibold text-white mb-4 flex items-center space-x-2">
+            <i data-lucide="file-text" class="w-4 h-4 text-indigo-400"></i>
+            <span>Research Topic & Notes</span>
+          </h3>
+
+          <form id="uniquenessForm" class="space-y-4">
+            <div>
+              <label class="block text-xs font-medium text-slate-300 mb-1.5">Paper Title</label>
+              <input type="text" id="paperTitle" required
+                placeholder="e.g. Scalable Multi-Agent Decomposition for Conference Drafting"
+                value="Autonomous Multi-Agent Paper Writing with Verified Grounding"
+                class="w-full bg-slate-950 border border-slate-800 rounded-lg px-3.5 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition" />
+            </div>
+
+            <div>
+              <label class="block text-xs font-medium text-slate-300 mb-1.5">Abstract / Topic Description</label>
+              <textarea id="paperAbstract" rows="5" required
+                placeholder="Describe your research problem, methodology, and key contributions..."
+                class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition">We investigate multi-agent architectures for generating academic conference drafts. Our system incorporates topic uniqueness scoring using BGE-small embeddings and Semantic Scholar retrieval, rubric-based peer critique, and deterministic multi-venue LaTeX compilation to IEEE and ACL formats.</textarea>
+            </div>
+
+            <div>
+              <label class="block text-xs font-medium text-slate-300 mb-1.5">Researcher Notes (Optional)</label>
+              <textarea id="userNotes" rows="2"
+                placeholder="Specific empirical details, novel datasets, or baseline comparisons..."
+                class="w-full bg-slate-950 border border-slate-800 rounded-lg p-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-1 focus:ring-indigo-500 transition">Evaluated on ACLSum aspect summarization with Qwen2.5-1.5B LoRA adapter and RINoBench novelty ratings.</textarea>
+            </div>
+
+            <!-- Overlap Threshold Slider -->
+            <div class="pt-2 border-t border-slate-800/80">
+              <div class="flex justify-between items-center mb-1">
+                <label class="text-xs font-medium text-slate-300">Overlap Alert Threshold</label>
+                <span id="thresholdValue" class="text-xs font-mono text-indigo-400 font-semibold">0.75</span>
+              </div>
+              <input type="range" id="thresholdSlider" min="0.50" max="0.90" step="0.05" value="0.75"
+                class="w-full h-1.5 bg-slate-800 rounded-lg appearance-none cursor-pointer accent-indigo-500" />
+              <p class="text-[11px] text-slate-500 mt-1">Triggers high-overlap warning and paper recommendations when overlap exceeds this value.</p>
+            </div>
+
+            <!-- Pre-fill presets buttons -->
+            <div class="pt-2">
+              <label class="block text-[11px] font-medium text-slate-400 mb-2">Load Benchmark Presets:</label>
+              <div class="flex flex-wrap gap-2">
+                <button type="button" onclick="loadPreset('transformer')" class="text-xs px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 transition">
+                  Transformer (High Overlap)
+                </button>
+                <button type="button" onclick="loadPreset('react')" class="text-xs px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 transition">
+                  ReAct Agents
+                </button>
+                <button type="button" onclick="loadPreset('bio')" class="text-xs px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 transition">
+                  Novel Bio Topic
+                </button>
+              </div>
+            </div>
+
+            <button type="submit" id="submitBtn"
+              class="w-full mt-4 bg-indigo-600 hover:bg-indigo-500 text-white font-medium py-2.5 px-4 rounded-lg flex items-center justify-center space-x-2 shadow-lg shadow-indigo-600/25 transition">
+              <i data-lucide="sparkles" class="w-4 h-4"></i>
+              <span>Compute Topic Uniqueness</span>
+            </button>
+          </form>
+        </div>
+      </div>
+
+      <!-- Right Column: Results & Overlap Meter -->
+      <div class="lg:col-span-7 space-y-6">
+        <!-- Initial Placeholder State -->
+        <div id="emptyState" class="bg-slate-900/60 border border-slate-800/80 border-dashed rounded-xl p-12 text-center">
+          <div class="w-12 h-12 rounded-full bg-slate-800 flex items-center justify-center mx-auto mb-4 text-slate-400">
+            <i data-lucide="compass" class="w-6 h-6"></i>
+          </div>
+          <h4 class="text-base font-semibold text-white mb-1">Awaiting Topic Input</h4>
+          <p class="text-sm text-slate-400 max-w-sm mx-auto">
+            Click "Compute Topic Uniqueness" to trigger hybrid retrieval, calculate overlap against verified literature, and view recommendations.
+          </p>
+        </div>
+
+        <!-- Loading State -->
+        <div id="loadingState" class="hidden bg-slate-900 border border-slate-800 rounded-xl p-12 text-center">
+          <div class="inline-block animate-spin rounded-full h-8 w-8 border-2 border-indigo-500 border-t-transparent mb-4"></div>
+          <h4 class="text-sm font-semibold text-white">Analyzing literature & embedding topic...</h4>
+          <p class="text-xs text-slate-400 mt-1">Querying local FAISS index + Semantic Scholar Graph API</p>
+        </div>
+
+        <!-- Result Container -->
+        <div id="resultsCard" class="hidden space-y-6">
+          <!-- Score Dashboard Card -->
+          <div class="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-xl">
+            <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800 pb-5">
+              <div>
+                <span class="text-xs uppercase font-bold tracking-wider text-slate-400">Topic Uniqueness Score</span>
+                <div class="flex items-baseline space-x-3 mt-1">
+                  <span id="scoreDisplay" class="text-4xl font-extrabold text-white font-mono">0.0</span>
+                  <span class="text-sm text-slate-400 font-mono">/ 100</span>
+                </div>
+              </div>
+
+              <!-- Overlap Status Badge -->
+              <div>
+                <span id="overlapBadge" class="inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold">
+                  Analyzing...
+                </span>
+              </div>
+            </div>
+
+            <!-- Overlap Meter Bar -->
+            <div class="mt-5 space-y-2">
+              <div class="flex justify-between text-xs">
+                <span class="text-slate-400">Overlap Meter: <span id="rawOverlapDisplay" class="font-mono text-slate-200">0.00</span></span>
+                <span class="text-slate-400">Threshold: <span id="thresholdDisplay" class="font-mono text-indigo-400">0.75</span></span>
+              </div>
+              <div class="w-full bg-slate-950 h-3 rounded-full overflow-hidden border border-slate-800 relative">
+                <div id="overlapProgressBar" class="h-full rounded-full transition-all duration-700 bg-indigo-500" style="width: 0%"></div>
+              </div>
+              <div class="flex justify-between text-[11px] text-slate-500">
+                <span>0.0 (High Novelty)</span>
+                <span>0.50 (Moderate)</span>
+                <span>1.0 (Direct Duplicate)</span>
+              </div>
+            </div>
+
+            <!-- Calibration & Latency Metrics -->
+            <div class="mt-6 grid grid-cols-2 sm:grid-cols-3 gap-3 pt-4 border-t border-slate-800/80 text-xs">
+              <div class="bg-slate-950/70 p-3 rounded-lg border border-slate-800">
+                <span class="text-slate-400 block text-[11px]">Calibrated Novelty</span>
+                <span id="calibratedRating" class="text-sm font-bold text-amber-400 font-mono mt-0.5 block">0.0 / 5.0</span>
+                <span class="text-[10px] text-slate-500">RINoBench Isotonic</span>
+              </div>
+              <div class="bg-slate-950/70 p-3 rounded-lg border border-slate-800">
+                <span class="text-slate-400 block text-[11px]">Measured Latency</span>
+                <span id="latencyDisplay" class="text-sm font-bold text-slate-200 font-mono mt-0.5 block">0 ms</span>
+                <span class="text-[10px] text-slate-500">End-to-end roundtrip</span>
+              </div>
+              <div class="bg-slate-950/70 p-3 rounded-lg border border-slate-800 col-span-2 sm:col-span-1">
+                <span class="text-slate-400 block text-[11px]">Cache Status</span>
+                <span id="cacheDisplay" class="text-sm font-bold text-emerald-400 font-mono mt-0.5 block">FAISS Warm</span>
+                <span class="text-[10px] text-slate-500">SQLite + Vector Index</span>
+              </div>
+            </div>
+
+            <!-- Coverage Caveat Notice -->
+            <div class="mt-5 p-3 rounded-lg bg-amber-950/30 border border-amber-800/40 text-amber-300 text-xs flex items-start space-x-2.5">
+              <i data-lucide="alert-triangle" class="w-4 h-4 text-amber-400 shrink-0 mt-0.5"></i>
+              <p id="caveatDisplay" class="leading-relaxed">
+                Coverage caveat: Literature retrieval misses relevant papers (estimated LitSearch Recall@20 is ~0.66). This score is an empirical estimate, not a novelty verdict.
+              </p>
+            </div>
+          </div>
+
+          <!-- Differentiation Suggestions (if high overlap) -->
+          <div id="differentiationCard" class="hidden bg-slate-900 border border-slate-800 rounded-xl p-5 shadow-xl">
+            <h4 class="text-xs font-bold uppercase tracking-wider text-indigo-400 mb-3 flex items-center space-x-1.5">
+              <i data-lucide="lightbulb" class="w-4 h-4"></i>
+              <span>Actionable Differentiation Strategies</span>
+            </h4>
+            <ul id="differentiationList" class="space-y-2 text-xs text-slate-300 list-disc list-inside"></ul>
+          </div>
+
+          <!-- Recommended / Overlapping Papers List -->
+          <div class="bg-slate-900 border border-slate-800 rounded-xl p-6 shadow-xl space-y-4">
+            <div class="flex items-center justify-between">
+              <h4 class="text-sm font-bold text-white flex items-center space-x-2">
+                <i data-lucide="book-open" class="w-4 h-4 text-indigo-400"></i>
+                <span id="papersHeader">Closest Literature Matches</span>
+              </h4>
+              <span id="paperCountBadge" class="text-xs font-mono text-slate-400">0 papers</span>
+            </div>
+
+            <div id="papersList" class="space-y-3.5"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script>
+    // Initialize Lucide icons
+    lucide.createIcons();
+
+    const slider = document.getElementById('thresholdSlider');
+    const thresholdVal = document.getElementById('thresholdValue');
+    slider.addEventListener('input', (e) => {
+      thresholdVal.textContent = parseFloat(e.target.value).toFixed(2);
+    });
+
+    const presets = {
+      transformer: {
+        title: "Attention Is All You Need",
+        abstract: "The dominant sequence transduction models are based on complex recurrent or convolutional neural networks. We propose the Transformer, an architecture based solely on self-attention mechanisms.",
+        notes: "Evaluated on WMT 2014 English-to-German translation."
+      },
+      react: {
+        title: "ReAct: Synergizing Reasoning and Acting in Language Models",
+        abstract: "While LLMs demonstrate impressive reasoning, their abilities to reason and act have been studied separately. We explore using LLMs to generate reasoning traces and task-specific actions in an interleaved manner.",
+        notes: "Evaluated on HotpotQA and ALFWorld interactive environments."
+      },
+      bio: {
+        title: "Cryogenic Enzymatic Synthesis of Bio-Degradable Superconductors",
+        abstract: "We synthesize organic enzymes operating at liquid helium temperatures to achieve room pressure zero electrical resistance in non-silicon biopolymers with high biocompatibility.",
+        notes: "Non-destructive electron crystallography measurements."
+      }
+    };
+
+    function loadPreset(key) {
+      const p = presets[key];
+      if (!p) return;
+      document.getElementById('paperTitle').value = p.title;
+      document.getElementById('paperAbstract').value = p.abstract;
+      document.getElementById('userNotes').value = p.notes;
+    }
+
+    document.getElementById('uniquenessForm').addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const title = document.getElementById('paperTitle').value.trim();
+      const abstract = document.getElementById('paperAbstract').value.trim();
+      const user_notes = document.getElementById('userNotes').value.trim();
+      const overlap_threshold = parseFloat(slider.value);
+
+      document.getElementById('emptyState').classList.add('hidden');
+      document.getElementById('resultsCard').classList.add('hidden');
+      document.getElementById('loadingState').classList.remove('hidden');
+
+      try {
+        const resp = await fetch('/api/uniqueness', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ title, abstract, user_notes, overlap_threshold })
+        });
+
+        if (!resp.ok) {
+          throw new Error('API error: ' + resp.statusText);
+        }
+
+        const data = await resp.json();
+        renderResults(data);
+      } catch (err) {
+        alert('Analysis error: ' + err.message);
+      } finally {
+        document.getElementById('loadingState').classList.add('hidden');
+      }
+    });
+
+    function renderResults(data) {
+      document.getElementById('resultsCard').classList.remove('hidden');
+
+      // 1. Score display
+      document.getElementById('scoreDisplay').textContent = data.uniqueness_score.toFixed(1);
+      document.getElementById('rawOverlapDisplay').textContent = data.overlap_meter.raw_overlap.toFixed(4);
+      document.getElementById('thresholdDisplay').textContent = data.overlap_meter.threshold.toFixed(2);
+      document.getElementById('calibratedRating').textContent = data.calibrated_novelty_rating.toFixed(1) + ' / 5.0';
+      document.getElementById('latencyDisplay').textContent = Math.round(data.latency_ms) + ' ms';
+      document.getElementById('caveatDisplay').textContent = data.coverage_caveat;
+
+      // 2. Overlap meter bar & status badge
+      const pct = Math.min(100, Math.max(0, data.overlap_meter.raw_overlap * 100));
+      const bar = document.getElementById('overlapProgressBar');
+      bar.style.width = pct + '%';
+
+      const badge = document.getElementById('overlapBadge');
+      if (data.overlap_meter.is_high_overlap) {
+        badge.className = "inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-rose-950 text-rose-300 border border-rose-800";
+        badge.textContent = "High Overlap Warning (" + (data.overlap_meter.raw_overlap * 100).toFixed(1) + "%)";
+        bar.className = "h-full rounded-full transition-all duration-700 bg-rose-500";
+      } else if (data.overlap_meter.raw_overlap > 0.55) {
+        badge.className = "inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-amber-950 text-amber-300 border border-amber-800";
+        badge.textContent = "Moderate Overlap (" + (data.overlap_meter.raw_overlap * 100).toFixed(1) + "%)";
+        bar.className = "h-full rounded-full transition-all duration-700 bg-amber-500";
+      } else {
+        badge.className = "inline-flex items-center px-3 py-1.5 rounded-full text-xs font-semibold bg-emerald-950 text-emerald-300 border border-emerald-800";
+        badge.textContent = "High Novelty (" + data.uniqueness_score.toFixed(1) + "/100)";
+        bar.className = "h-full rounded-full transition-all duration-700 bg-emerald-500";
+      }
+
+      // 3. Differentiation suggestions
+      const diffCard = document.getElementById('differentiationCard');
+      const diffList = document.getElementById('differentiationList');
+      diffList.innerHTML = '';
+      if (data.differentiation_suggestions && data.differentiation_suggestions.length > 0) {
+        diffCard.classList.remove('hidden');
+        data.differentiation_suggestions.forEach(s => {
+          const li = document.createElement('li');
+          li.textContent = s;
+          diffList.appendChild(li);
+        });
+      } else {
+        diffCard.classList.add('hidden');
+      }
+
+      // 4. Papers list
+      const papersList = document.getElementById('papersList');
+      papersList.innerHTML = '';
+      document.getElementById('paperCountBadge').textContent = data.recommended_papers.length + " papers";
+      document.getElementById('papersHeader').textContent = data.overlap_meter.is_high_overlap
+        ? "Top Overlapping Literature Recommendations"
+        : "Closest Related Baseline Papers";
+
+      data.recommended_papers.forEach((p, idx) => {
+        const card = document.createElement('div');
+        card.className = "bg-slate-950 border border-slate-800/80 rounded-lg p-4 space-y-2 hover:border-slate-700 transition";
+
+        const simPct = (p.similarity_score * 100).toFixed(1);
+        const authorsStr = p.authors && p.authors.length ? p.authors.slice(0, 3).join(', ') + (p.authors.length > 3 ? ' et al.' : '') : 'Authors unknown';
+        const venueYear = [p.venue, p.year].filter(Boolean).join(' • ');
+
+        card.innerHTML = `
+          <div class="flex items-start justify-between gap-3">
+            <h5 class="text-sm font-semibold text-slate-100 hover:text-indigo-400 transition">
+              <a href="${p.url || '#'}" target="_blank" class="hover:underline flex items-center space-x-1.5">
+                <span>${idx + 1}. ${p.title}</span>
+                <i data-lucide="external-link" class="w-3.5 h-3.5 text-slate-500 inline shrink-0"></i>
+              </a>
+            </h5>
+            <span class="shrink-0 text-xs font-mono font-bold px-2 py-0.5 rounded bg-slate-900 border border-slate-700 text-indigo-300">
+              ${simPct}% sim
+            </span>
+          </div>
+
+          <div class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-slate-400">
+            <span>${authorsStr}</span>
+            ${venueYear ? `<span>•</span><span>${venueYear}</span>` : ''}
+            ${p.citation_count ? `<span class="px-1.5 py-0.5 rounded bg-slate-900 text-slate-300 font-mono text-[11px]">${p.citation_count.toLocaleString()} citations</span>` : ''}
+          </div>
+
+          ${p.grounded_reason ? `
+            <div class="mt-2 text-xs bg-slate-900/80 rounded p-2 border border-slate-800 text-slate-300">
+              <span class="text-indigo-400 font-medium">Grounded overlap:</span> ${p.grounded_reason}
+            </div>
+          ` : ''}
+        `;
+        papersList.appendChild(card);
+      });
+
+      lucide.createIcons();
+    }
+  </script>
+</body>
+</html>

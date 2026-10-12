@@ -1,0 +1,134 @@
+[
+  {
+    "paper_id": "204e3073870fae3d05bcbc2f6a8e263c9b72e776",
+    "title": "Attention Is All You Need",
+    "abstract": "The dominant sequence transduction models are based on complex recurrent or convolutional neural networks that include an encoder and a decoder. The best performing models also connect the encoder and decoder through an attention mechanism. We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely. Experiments on two machine translation tasks show these models to be superior in quality while being more parallelizable and requiring significantly less time to train.",
+    "year": 2017,
+    "authors": ["Ashish Vaswani", "Noam Shazeer", "Niki Parmar", "Jakob Uszkoreit", "Llion Jones", "Aidan N. Gomez", "Lukasz Kaiser", "Illia Polosukhin"],
+    "venue": "NeurIPS",
+    "citation_count": 125000,
+    "url": "https://www.semanticscholar.org/paper/204e3073870fae3d05bcbc2f6a8e263c9b72e776",
+    "external_ids": {"DOI": "10.5555/3295222.3295349", "ArXiv": "1706.03762"}
+  },
+  {
+    "paper_id": "df2b0e26d0599ce3e70df8a9dae15016f49764a0",
+    "title": "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding",
+    "abstract": "We introduce a new language representation model called BERT, which stands for Bidirectional Encoder Representations from Transformers. Unlike recent language representation models, BERT is designed to pre-train deep bidirectional representations from unlabeled text by jointly conditioning on both left and right context in all layers. As a result, the pre-trained BERT model can be fine-tuned with just one additional output layer to create state-of-the-art models for a wide range of tasks.",
+    "year": 2019,
+    "authors": ["Jacob Devlin", "Ming-Wei Chang", "Kenton Lee", "Kristina Toutanova"],
+    "venue": "NAACL",
+    "citation_count": 89000,
+    "url": "https://www.semanticscholar.org/paper/df2b0e26d0599ce3e70df8a9dae15016f49764a0",
+    "external_ids": {"DOI": "10.18653/v1/N19-1423", "ArXiv": "1810.04805"}
+  },
+  {
+    "paper_id": "6b9e7da924294d137f8426ecbda7834220b3fe30",
+    "title": "Language Models are Few-Shot Learners",
+    "abstract": "Recent work has demonstrated substantial gains on many NLP tasks and benchmarks by pre-training on a large corpus of text followed by fine-tuning on a specific task. While typically task-agnostic in architecture, this method still requires task-specific fine-tuning datasets of thousands or tens of thousands of examples. Here we show that scaling up language models greatly improves task-agnostic, few-shot performance, sometimes even reaching competitiveness with prior state-of-the-art fine-tuning approaches.",
+    "year": 2020,
+    "authors": ["Tom B. Brown", "Benjamin Mann", "Nick Ryder", "Melanie Subbiah", "Jared Kaplan", "Prafulla Dhariwal", "Arvind Neelakantan", "Pranav Shyam", "Girish Sastry", "Amanda Askell"],
+    "venue": "NeurIPS",
+    "citation_count": 42000,
+    "url": "https://www.semanticscholar.org/paper/6b9e7da924294d137f8426ecbda7834220b3fe30",
+    "external_ids": {"ArXiv": "2005.14165"}
+  },
+  {
+    "paper_id": "e9323ff8d2348c4cf330fcbc0c2f821731693fa7",
+    "title": "Chain-of-Thought Prompting Elicits Reasoning in Large Language Models",
+    "abstract": "We explore how generating a chain of thought—a series of intermediate reasoning steps—significantly improves the ability of large language models to perform complex reasoning. In particular, we show how such reasoning abilities emerge naturally in sufficiently large language models via a simple method called chain of thought prompting, where a few chain of thought demonstrations are provided as exemplars in prompting.",
+    "year": 2022,
+    "authors": ["Jason Wei", "Xuezhi Wang", "Dale Schuurmans", "Maarten Bosma", "Brian Ichter", "Fei Xia", "Ed H. Chi", "Quoc V. Le", "Denny Zhou"],
+    "venue": "NeurIPS",
+    "citation_count": 8200,
+    "url": "https://www.semanticscholar.org/paper/e9323ff8d2348c4cf330fcbc0c2f821731693fa7",
+    "external_ids": {"ArXiv": "2201.11903"}
+  },
+  {
+    "paper_id": "4020a53fe7c9802cfec8651fe83ee66cb7df0a77",
+    "title": "LoRA: Low-Rank Adaptation of Large Language Models",
+    "abstract": "An important paradigm of natural language processing consists of large-scale pre-training on general domain data and adaptation to specific tasks or domains. As we pre-train larger models, full fine-tuning, which retrains all model parameters, becomes less feasible. We propose Low-Rank Adaptation, or LoRA, which freezes the pre-trained model weights and injects trainable rank decomposition matrices into each layer of the Transformer architecture, greatly reducing the number of trainable parameters for downstream tasks.",
+    "year": 2021,
+    "authors": ["Edward J. Hu", "Yelong Shen", "Phillip Wallis", "Zeyuan Allen-Zhu", "Yuanzhi Li", "Shean Wang", "Lu Wang", "Weizhu Chen"],
+    "venue": "ICLR",
+    "citation_count": 14500,
+    "url": "https://www.semanticscholar.org/paper/4020a53fe7c9802cfec8651fe83ee66cb7df0a77",
+    "external_ids": {"ArXiv": "2106.09685"}
+  },
+  {
+    "paper_id": "f55097aa4807469a4753ca1b585fb5e19dbf92e5",
+    "title": "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks",
+    "abstract": "Large pre-trained language models have been shown to store factual knowledge in their parameters, and achieve state-of-the-art results when fine-tuned on downstream NLP tasks. However, their ability to access and precisely manipulate knowledge is still limited. In this work, we explore general-purpose fine-tuning recipes for retrieval-augmented generation (RAG) — models which combine pre-trained parametric and non-parametric memory for language generation.",
+    "year": 2020,
+    "authors": ["Patrick Lewis", "Ethan Perez", "Aleksandra Piktus", "Fabio Petroni", "Vladimir Karpukhin", "Naman Goyal", "Heinrich Kuttler", "Mike Lewis", "Wen-tau Yih", "Tim Rocktäschel"],
+    "venue": "NeurIPS",
+    "citation_count": 9100,
+    "url": "https://www.semanticscholar.org/paper/f55097aa4807469a4753ca1b585fb5e19dbf92e5",
+    "external_ids": {"ArXiv": "2005.11401"}
+  },
+  {
+    "paper_id": "19b52eb4434d7d3d249d32d32578fa189c7ad6e7",
+    "title": "ReAct: Synergizing Reasoning and Acting in Language Models",
+    "abstract": "While large language models (LLMs) have demonstrated impressive performance across various reasoning and decision-making tasks, their abilities to reason and act have primarily been studied as separate topics. In this paper, we explore the use of LLMs to generate both reasoning traces and task-specific actions in an interleaved manner, allowing for greater synergy between the two.",
+    "year": 2022,
+    "authors": ["Shunyu Yao", "Jeffrey Zhao", "Dian Yu", "Nan Du", "Izhak Shafran", "Karthik Narasimhan", "Yuan Cao"],
+    "venue": "ICLR",
+    "citation_count": 4800,
+    "url": "https://www.semanticscholar.org/paper/19b52eb4434d7d3d249d32d32578fa189c7ad6e7",
+    "external_ids": {"ArXiv": "2210.03629"}
+  },
+  {
+    "paper_id": "67b93c8309df559c5859368d1979b0ea6ef8542c",
+    "title": "Tree of Thoughts: Deliberate Problem Solving with Large Language Models",
+    "abstract": "Language models are increasingly being deployed for general problem solving across a wide range of tasks, but are still constrained to token-level, left-to-right decision-making processes during inference. We introduce Tree of Thoughts (ToT), which generalizes over popular chain-of-thought prompting by exploring multiple reasoning paths over coherent units of thought and self-evaluating choices to deliberate over future actions.",
+    "year": 2023,
+    "authors": ["Shunyu Yao", "Dian Yu", "Jeffrey Zhao", "Izhak Shafran", "Thomas L. Griffiths", "Yuan Cao", "Karthik Narasimhan"],
+    "venue": "NeurIPS",
+    "citation_count": 3100,
+    "url": "https://www.semanticscholar.org/paper/67b93c8309df559c5859368d1979b0ea6ef8542c",
+    "external_ids": {"ArXiv": "2305.10601"}
+  },
+  {
+    "paper_id": "3ebaa5aebf1cb5b9f71ee435bb156291a92e1066",
+    "title": "Direct Preference Optimization: Your Language Model is Secretly a Reward Model",
+    "abstract": "While large-scale unsupervised language models learn broad world knowledge and reasoning capabilities, controlling their behavior is typically done via reinforcement learning from human feedback (RLHF). Existing RLHF pipelines fit a reward model and optimize a policy using PPO. We propose Direct Preference Optimization (DPO), a simple training algorithm that implicitly optimizes the same objective as RLHF without explicit reward modeling or reinforcement learning.",
+    "year": 2023,
+    "authors": ["Rafael Rafailov", "Archit Sharma", "Eric Mitchell", "Stefano Ermon", "Christopher D. Manning", "Chelsea Finn"],
+    "venue": "NeurIPS",
+    "citation_count": 3900,
+    "url": "https://www.semanticscholar.org/paper/3ebaa5aebf1cb5b9f71ee435bb156291a92e1066",
+    "external_ids": {"ArXiv": "2305.18290"}
+  },
+  {
+    "paper_id": "2b9da7034b2f4f141bf28485233ea154f65c1fe5",
+    "title": "QLoRA: Efficient Finetuning of Quantized LLMs",
+    "abstract": "We present QLoRA, an efficient finetuning approach that reduces memory usage enough to finetune a 65B parameter model on a single 48GB GPU while preserving full 16-bit finetuning task performance. QLoRA backpropagates gradients through a frozen, 4-bit quantized pretrained language model into Low Rank Adapters (LoRA), introducing innovations such as 4-bit NormalFloat and double quantization.",
+    "year": 2023,
+    "authors": ["Tim Dettmers", "Artidoro Pagnoni", "Ari Holtzman", "Luke Zettlemoyer"],
+    "venue": "NeurIPS",
+    "citation_count": 5200,
+    "url": "https://www.semanticscholar.org/paper/2b9da7034b2f4f141bf28485233ea154f65c1fe5",
+    "external_ids": {"ArXiv": "2305.14314"}
+  },
+  {
+    "paper_id": "a90f1469e8b9195048d08595cb6be11394a11bdf",
+    "title": "Decomposed Prompting: A Modular Approach for Solving Complex Tasks",
+    "abstract": "Few-shot prompting has emerged as a promising paradigm for solving diverse reasoning tasks with large language models. However, its effectiveness drops substantially for complex multi-step reasoning tasks. We propose Decomposed Prompting (DecomP), an approach that solves complex tasks by decomposing them into sub-tasks, each addressed by a dedicated few-shot prompt or external tool.",
+    "year": 2022,
+    "authors": ["Tushar Khot", "Harsh Trivedi", "Matthew Finlayson", "Yao Fu", "Kyle Richardson", "Peter Clark", "Ashish Sabharwal"],
+    "venue": "ICLR",
+    "citation_count": 1150,
+    "url": "https://www.semanticscholar.org/paper/a90f1469e8b9195048d08595cb6be11394a11bdf",
+    "external_ids": {"ArXiv": "2210.02406"}
+  },
+  {
+    "paper_id": "a73919e9cae568eb40375cf39883556bc1b8dfd8",
+    "title": "Reflexion: Language Agents with Verbal Reinforcement Learning",
+    "abstract": "Large language models (LLMs) are increasingly being used to interact with external environments as goal-driven agents. However, conventional reinforcement learning methods require extensive training and policy optimization. We propose Reflexion, an approach that endows LLM agents with dynamic memory and self-reflective capabilities using linguistic feedback rather than scalar reward updates.",
+    "year": 2023,
+    "authors": ["Noah Shinn", "Federico Cassano", "Edward Berman", "Ashwin Gopinath", "Karthik Narasimhan", "Shunyu Yao"],
+    "venue": "NeurIPS",
+    "citation_count": 2200,
+    "url": "https://www.semanticscholar.org/paper/a73919e9cae568eb40375cf39883556bc1b8dfd8",
+    "external_ids": {"ArXiv": "2303.11366"}
+  }
+]
