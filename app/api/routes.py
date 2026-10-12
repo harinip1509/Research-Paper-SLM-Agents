@@ -9,12 +9,15 @@ from fastapi.responses import FileResponse
 from pydantic import BaseModel
 
 from app.agents.formatting_agent import formatting_agent
+from app.agents.literature_agent import literature_agent
 from app.agents.uniqueness_agent import uniqueness_agent
 from app.agents.writing_agent import writing_agent
 from app.clients.semantic_scholar import s2_client
 from app.models.schemas import (
     FormatConstraintReport,
     FormatExportRequest,
+    LiteratureExtractRequest,
+    LiteratureExtractResponse,
     Paper,
     PaperDraft,
     PaperDraftSection,
@@ -216,3 +219,17 @@ async def condense_section(req: CondenseRequest) -> Dict[str, Any]:
         "condensed_words": len(condensed.split()),
         "condensed_text": condensed,
     }
+
+
+# =====================================================================
+# Milestone 3: Literature Aspect Summarizer
+# =====================================================================
+
+@router.post("/literature/extract", response_model=LiteratureExtractResponse)
+async def extract_literature_aspects(req: LiteratureExtractRequest) -> LiteratureExtractResponse:
+    """Extract research problem, method, dataset, results, and limitations into JSON."""
+    try:
+        return await literature_agent.extract_aspects(req)
+    except Exception as e:
+        logger.exception("Aspect extraction error: %s", e)
+        raise HTTPException(status_code=500, detail=f"Aspect extraction failed: {str(e)}")

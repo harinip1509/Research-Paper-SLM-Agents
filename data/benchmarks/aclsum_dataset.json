@@ -1,0 +1,80 @@
+{
+  "train": [
+    {
+      "paper_id": "aclsum_tr_01",
+      "title": "BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding",
+      "abstract": "We introduce a new language representation model called BERT, which stands for Bidirectional Encoder Representations from Transformers. Unlike recent language representation models, BERT is designed to pre-train deep bidirectional representations from unlabeled text by jointly conditioning on both left and right context in all layers. As a result, the pre-trained BERT model can be fine-tuned with just one additional output layer to create state-of-the-art models for a wide range of tasks, such as question answering and language inference, without substantial task-specific architecture modifications.",
+      "gold_aspects": {
+        "research_problem": "Pre-training deep bidirectional representations from unlabeled text where previous models were constrained to unidirectional left-to-right architectures.",
+        "method": "Masked language model (MLM) objective that masks random tokens and predicts them using bidirectional context, combined with next sentence prediction (NSP).",
+        "dataset": "BooksCorpus (800M words) and English Wikipedia (2,500M words); evaluated on GLUE benchmark, SQuAD v1.1, SQuAD v2.0, and SWAG.",
+        "results": "Obtained state-of-the-art results on eleven NLP benchmarks, achieving 80.5% on GLUE (7.7% absolute gain) and 93.2 F1 on SQuAD v1.1.",
+        "limitations": "Substantial compute requirements for pre-training and tokenization mismatch from the artificial [MASK] token."
+      }
+    },
+    {
+      "paper_id": "aclsum_tr_02",
+      "title": "LoRA: Low-Rank Adaptation of Large Language Models",
+      "abstract": "An important paradigm of natural language processing consists of large-scale pre-training on general domain data and adaptation to specific tasks or domains. As we pre-train larger models, full fine-tuning, which retrains all model parameters, becomes less feasible. We propose Low-Rank Adaptation, or LoRA, which freezes the pre-trained model weights and injects trainable rank decomposition matrices into each layer of the Transformer architecture, greatly reducing the number of trainable parameters for downstream tasks.",
+      "gold_aspects": {
+        "research_problem": "Prohibitive memory and storage costs of full parameter fine-tuning for massive pre-trained language models.",
+        "method": "Low-Rank Adaptation (LoRA) freezing pre-trained weights and optimizing low-rank decomposition rank matrices injected into Transformer self-attention projections.",
+        "dataset": "Evaluated on RoBERTa, DeBERTa, and GPT-3 175B across GLUE benchmark, MultiNLI, and WikiSQL.",
+        "results": "Matches or exceeds full fine-tuning performance while reducing trainable parameters by 10,000x and GPU memory consumption by 3x with zero added inference latency.",
+        "limitations": "Cannot easily serve dynamic batched requests with different task adapters without kernel switching overhead."
+      }
+    },
+    {
+      "paper_id": "aclsum_tr_03",
+      "title": "Retrieval-Augmented Generation for Knowledge-Intensive NLP Tasks",
+      "abstract": "Large pre-trained language models have been shown to store factual knowledge in their parameters, and achieve state-of-the-art results when fine-tuned on downstream NLP tasks. However, their ability to access and precisely manipulate knowledge is still limited. In this work, we explore general-purpose fine-tuning recipes for retrieval-augmented generation (RAG) — models which combine pre-trained parametric and non-parametric memory for language generation.",
+      "gold_aspects": {
+        "research_problem": "Hallucination and stale factual knowledge in parametric weights of pre-trained language models on knowledge-intensive NLP tasks.",
+        "method": "Hybrid model combining a pre-trained dense passage retriever (non-parametric memory) with a seq2seq generator (BART parametric memory) marginalizing over retrieved documents.",
+        "dataset": "Wikipedia dump index evaluated on Natural Questions, WebQuestions, CuratedTREC, MS-MARCO, and Jeopardy question generation.",
+        "results": "Established new state of the art on open-domain QA benchmarks while generating more specific, diverse, and factually grounded text.",
+        "limitations": "Computational overhead of neural dense retrieval and passage reranking during inference."
+      }
+    }
+  ],
+  "validation": [
+    {
+      "paper_id": "aclsum_val_01",
+      "title": "ReAct: Synergizing Reasoning and Acting in Language Models",
+      "abstract": "While large language models (LLMs) have demonstrated impressive performance across various reasoning and decision-making tasks, their abilities to reason and act have primarily been studied as separate topics. In this paper, we explore the use of LLMs to generate both reasoning traces and task-specific actions in an interleaved manner, allowing for greater synergy between the two.",
+      "gold_aspects": {
+        "research_problem": "Separate handling of reasoning traces and environmental actions leading to error propagation and lack of dynamic grounded feedback.",
+        "method": "ReAct prompting framework interleaving thought generation (reasoning traces) and external environment actions/observations in a unified trajectory.",
+        "dataset": "Evaluated on HotpotQA, Fever, and interactive decision-making environments ALFWorld and WebShop.",
+        "results": "Overcomes hallucination issues in chain-of-thought prompting while generating human-interpretable task-solving trajectories with higher task success rates.",
+        "limitations": "Dependent on prompt demonstration quality and constrained by context window length during long interactive episodes."
+      }
+    }
+  ],
+  "held_out_test": [
+    {
+      "paper_id": "aclsum_test_01",
+      "title": "Attention Is All You Need",
+      "abstract": "The dominant sequence transduction models are based on complex recurrent or convolutional neural networks that include an encoder and a decoder. The best performing models also connect the encoder and decoder through an attention mechanism. We propose a new simple network architecture, the Transformer, based solely on attention mechanisms, dispensing with recurrence and convolutions entirely. Experiments on two machine translation tasks show these models to be superior in quality while being more parallelizable and requiring significantly less time to train.",
+      "gold_aspects": {
+        "research_problem": "Sequential computational bottleneck and vanishing gradient limitations of recurrent and convolutional sequence transduction architectures.",
+        "method": "The Transformer: an encoder-decoder architecture dispensing entirely with recurrence, relying solely on multi-head scaled dot-product self-attention mechanisms.",
+        "dataset": "WMT 2014 English-to-German (4.5M sentence pairs) and WMT 2014 English-to-French (36M sentence pairs) translation benchmarks.",
+        "results": "Achieved 28.4 BLEU on English-to-German (improving over existing ensembles by 2.0 BLEU) and 41.8 BLEU on English-to-French after only 3.5 days of training on 8 GPUs.",
+        "limitations": "Quadratic computational and memory complexity with respect to sequence length in full self-attention."
+      }
+    },
+    {
+      "paper_id": "aclsum_test_02",
+      "title": "QLoRA: Efficient Finetuning of Quantized LLMs",
+      "abstract": "We present QLoRA, an efficient finetuning approach that reduces memory usage enough to finetune a 65B parameter model on a single 48GB GPU while preserving full 16-bit finetuning task performance. QLoRA backpropagates gradients through a frozen, 4-bit quantized pretrained language model into Low Rank Adapters (LoRA), introducing innovations such as 4-bit NormalFloat and double quantization.",
+      "gold_aspects": {
+        "research_problem": "High memory barrier preventing fine-tuning of 65B+ parameter LLMs on accessible consumer or single-node GPUs.",
+        "method": "QLoRA: backpropagating gradients through frozen 4-bit NormalFloat (NF4) weights into 16-bit LoRA adapters with Double Quantization and Paged Optimizers.",
+        "dataset": "OASST1 instruction dataset, Vicuna benchmark, and MMLU benchmark across LLaMA model family (7B to 65B).",
+        "results": "Fine-tuned 65B parameter models on a single 48GB GPU matching 16-bit full fine-tuning performance and reaching 99.3% of ChatGPT performance on Vicuna benchmark.",
+        "limitations": "Quantization and dequantization kernels introduce 30% compute runtime overhead compared to unquantized 16-bit training."
+      }
+    }
+  ]
+}
