@@ -69,7 +69,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
       <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
         <div>
           <div className="text-[11px] font-mono tracking-widest text-[#2563eb] font-semibold uppercase mb-1.5">
-            ResearchFlow AI — Dashboard
+            ScholarForge — Dashboard
           </div>
           <h1 className="text-3xl sm:text-4xl font-bold font-serif text-slate-900 tracking-tight">
             Research Workflow
@@ -163,7 +163,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             Originality Score
           </div>
           <div className="text-xl font-bold font-serif text-slate-900 mt-2">
-            {uniquenessScore !== null ? (uniquenessScore / 100).toFixed(3) : '—'}
+            {typeof uniquenessScore === 'number' && !isNaN(uniquenessScore)
+              ? (uniquenessScore / 100).toFixed(3)
+              : '—'}
           </div>
         </div>
 
@@ -266,11 +268,11 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
               Recent Projects
             </h3>
             <span className="text-[10px] font-mono text-slate-400 uppercase font-semibold">
-              {projects.length} saved
+              {Array.isArray(projects) ? projects.length : 0} saved
             </span>
           </div>
 
-          {projects.length === 0 ? (
+          {!Array.isArray(projects) || projects.length === 0 ? (
             <div className="py-8 text-center border border-dashed border-slate-200 rounded-lg">
               <Clock className="w-6 h-6 text-slate-300 mx-auto mb-2" />
               <p className="text-xs text-slate-500 font-medium">No saved research projects yet.</p>
@@ -280,29 +282,31 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             </div>
           ) : (
             <div className="divide-y divide-slate-100 max-h-[300px] overflow-y-auto">
-              {projects.map((p) => (
+              {(Array.isArray(projects) ? projects : []).map((p) => (
                 <div key={p.id} className="py-3.5 first:pt-0 last:pb-0 group">
                   <div className="flex items-start justify-between gap-2">
                     <div
                       onClick={() => onSelectProject(p.id)}
                       className="text-xs font-semibold text-slate-900 hover:text-[#2563eb] cursor-pointer line-clamp-1"
                     >
-                      {p.title}
+                      {p.title || 'Untitled Project'}
                     </div>
                     <div className="text-[10px] font-mono text-slate-400 shrink-0">
-                      {p.updated_at ? p.updated_at.split(' ')[0] : 'Today'}
+                      {typeof p.updated_at === 'string' && p.updated_at
+                        ? p.updated_at.split(' ')[0].split('T')[0]
+                        : 'Today'}
                     </div>
                   </div>
 
                   <div className="flex items-center justify-between mt-1.5 text-[11px] font-mono">
                     <div className="flex items-center gap-3">
-                      <span className="text-slate-500 uppercase">{p.venue}</span>
-                      {p.papers_count > 0 && (
+                      <span className="text-slate-500 uppercase">{p.venue || 'ieee'}</span>
+                      {typeof p.papers_count === 'number' && p.papers_count > 0 && (
                         <span className="text-slate-500">{p.papers_count} papers</span>
                       )}
-                      {p.uniqueness_score !== null && (
+                      {p.uniqueness_score != null && !isNaN(Number(p.uniqueness_score)) && (
                         <span className="text-emerald-600 font-semibold">
-                          Orig: {(p.uniqueness_score / 100).toFixed(3)}
+                          Orig: {(Number(p.uniqueness_score) / 100).toFixed(3)}
                         </span>
                       )}
                     </div>

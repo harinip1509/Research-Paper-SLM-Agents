@@ -84,7 +84,7 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         {/* Header */}
         <div className="mb-6">
           <div className="text-[10px] font-mono tracking-widest text-[#2563eb] font-semibold uppercase mb-1">
-            ResearchFlow AI Platform
+            ScholarForge AI Platform
           </div>
           <h2 className="text-2xl font-bold font-serif text-slate-900">
             {mode === 'signup' ? 'Create Researcher Account' : 'Sign In to Workspace'}

@@ -33,17 +33,23 @@ export default function App() {
   const [projects, setProjects] = useState<ProjectSummary[]>([])
 
   const refreshProjects = () => {
-    apiListProjects().then((list) => {
-      setProjects(list)
-    })
+    apiListProjects()
+      .then((list) => {
+        setProjects(Array.isArray(list) ? list : [])
+      })
+      .catch(() => {
+        setProjects([])
+      })
   }
 
   useEffect(() => {
-    apiGetMe().then((u) => {
-      if (u) {
-        setUser(u)
-      }
-    })
+    apiGetMe()
+      .then((u) => {
+        if (u) {
+          setUser(u)
+        }
+      })
+      .catch(() => {})
     refreshProjects()
   }, [])
 
@@ -53,8 +59,9 @@ export default function App() {
   }
 
   const handleAuthSuccess = (u: User) => {
-    setUser(u)
+    setUser(u || null)
     setIsLanding(false)
+    setCurrentNav('dashboard')
     refreshProjects()
   }
 

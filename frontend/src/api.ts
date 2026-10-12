@@ -270,11 +270,16 @@ export async function apiDownloadDocx(params: {
 }
 
 export async function apiListProjects(): Promise<ProjectSummary[]> {
-  const res = await fetch(`${API_BASE}/projects`, {
-    headers: { ...getAuthHeader() },
-  })
-  if (!res.ok) return []
-  return res.json().catch(() => [])
+  try {
+    const res = await fetch(`${API_BASE}/projects`, {
+      headers: { ...getAuthHeader() },
+    })
+    if (!res.ok) return []
+    const data = await res.json().catch(() => [])
+    return Array.isArray(data) ? data : []
+  } catch {
+    return []
+  }
 }
 
 export async function apiSaveProject(params: {

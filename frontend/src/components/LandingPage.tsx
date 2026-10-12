@@ -88,14 +88,14 @@ export const LandingPage: React.FC<LandingPageProps> = ({ user, onStart, onOpenA
         <div className="max-w-6xl mx-auto px-4 sm:px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 rounded-lg bg-[#2563eb] text-white flex items-center justify-center font-bold text-base shadow-sm">
-              R
+              S
             </div>
             <div>
               <span className="font-semibold text-slate-900 text-base tracking-tight block">
-                ResearchFlow AI
+                ScholarForge
               </span>
               <span className="text-[10px] text-slate-400 font-mono tracking-wider uppercase block">
-                ScholarForge Academic Assistant
+                AI Conference Paper Assistant
               </span>
             </div>
           </div>

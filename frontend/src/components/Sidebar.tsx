@@ -58,14 +58,14 @@ export const Sidebar: React.FC<SidebarProps> = ({
           className="p-5 flex items-center gap-3 cursor-pointer border-b border-[#1a2d52]/60 hover:bg-[#162a52]/40 transition-colors"
         >
           <div className="w-8 h-8 rounded-lg bg-[#2563eb] text-white flex items-center justify-center font-bold text-base shadow-sm">
-            R
+            S
           </div>
           <div>
             <span className="font-semibold text-white text-base tracking-tight block">
-              ResearchFlow AI
+              ScholarForge
             </span>
             <span className="text-[10px] text-slate-400 font-mono tracking-wider uppercase block">
-              ScholarForge Core
+              Multi-Agent Assistant
             </span>
           </div>
         </div>
@@ -126,11 +126,11 @@ export const Sidebar: React.FC<SidebarProps> = ({
           <div className="p-2.5 rounded-lg bg-[#162a52]/80 border border-[#203a6b] flex items-center justify-between">
             <div className="flex items-center gap-2 truncate">
               <div className="w-7 h-7 rounded-full bg-[#2563eb]/30 border border-[#2563eb] flex items-center justify-center text-xs font-semibold text-white shrink-0">
-                {user.name.charAt(0).toUpperCase()}
+                {(user?.name?.trim()?.charAt(0) || user?.email?.trim()?.charAt(0) || 'S').toUpperCase()}
               </div>
               <div className="truncate text-left text-xs">
-                <div className="text-white font-medium truncate">{user.name}</div>
-                <div className="text-[10px] text-slate-400 truncate">{user.institution || 'Researcher'}</div>
+                <div className="text-white font-medium truncate">{user?.name?.trim() || user?.email?.trim() || 'Researcher'}</div>
+                <div className="text-[10px] text-slate-400 truncate">{user?.institution?.trim() || 'Scholar'}</div>
               </div>
             </div>
             <button
@@ -160,8 +160,8 @@ export const Sidebar: React.FC<SidebarProps> = ({
         )}
 
         <div className="text-[11px] font-mono text-slate-400 leading-tight">
-          <div className="text-slate-300 font-medium">ResearchFlow AI v1.0</div>
-          <div className="text-[10px] text-slate-400">Academic Research Platform</div>
+          <div className="text-slate-300 font-medium">ScholarForge v1.0</div>
+          <div className="text-[10px] text-slate-400">Academic Paper Assistant</div>
         </div>
       </div>
     </aside>
