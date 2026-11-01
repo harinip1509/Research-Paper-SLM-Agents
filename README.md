@@ -1,6 +1,6 @@
 # ScholarForge: A Multi-Agent Assistant for Writing Conference Papers
 
-[![CI Suite](https://github.com/scholarforge/scholarforge/actions/workflows/ci.yml/badge.svg)](https://github.com/scholarforge/scholarforge/actions)
+[![CI Suite](https://github.com/harinip1509/Research-Paper-SLM-Agents/actions/workflows/ci.yml/badge.svg)](https://github.com/harinip1509/Research-Paper-SLM-Agents/actions)
 [![Python 3.11+](https://img.shields.io/badge/python-3.11%20%7C%203.13-blue.svg)](https://www.python.org/)
 [![Groq Accelerated](https://img.shields.io/badge/Groq-LPU%20Inference-f55036.svg)](https://groq.com/)
 [![Semantic Scholar](https://img.shields.io/badge/Semantic%20Scholar-Graph%20API-1a56db.svg)](https://www.semanticscholar.org/)
@@ -191,8 +191,8 @@ All venue profiles are declared as data in `venues.yaml`:
 
 ```bash
 # 1. Clone repository
-git clone https://github.com/scholarforge/scholarforge.git
-cd scholarforge
+git clone https://github.com/harinip1509/Research-Paper-SLM-Agents.git
+cd Research-Paper-SLM-Agents
 
 # 2. Create virtual environment & install dependencies
 python3 -m venv .venv
@@ -244,6 +244,6 @@ ruff check .
   year = {2026},
   publisher = {GitHub},
   journal = {GitHub repository},
-  url = {https://github.com/scholarforge/scholarforge}
+  url = {https://github.com/harinip1509/Research-Paper-SLM-Agents}
 }
 ```
