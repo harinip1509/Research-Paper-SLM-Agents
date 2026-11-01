@@ -10,14 +10,13 @@ from __future__ import annotations
 import html as html_lib
 import io
 import logging
-import math
 import os
 import re
 import shutil
 import subprocess
 import tempfile
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional
 
 import jinja2
 import yaml
@@ -516,7 +515,7 @@ class FormattingAgent:
 
         # Case 2: Need LESS content to fit into a smaller user-requested page count (e.g. 1, 2, 3 pages)
         if total_existing_words > int(target_body_words * 1.18):
-            ratio = target_body_words / max(1, total_existing_words)
+            _ratio = target_body_words / max(1, total_existing_words)
             # If target_pages == 1 or 2 and there are many sections, keep the most essential sections
             working_secs = [dict(s) for s in raw_sections]
             if pages == 1 and len(working_secs) > 4:
@@ -794,7 +793,6 @@ ORIGINAL TEXT:
             FrameBreak,
             HRFlowable,
             NextPageTemplate,
-            PageBreak,
             PageTemplate,
             Paragraph,
             Spacer,
@@ -817,7 +815,6 @@ ORIGINAL TEXT:
             base_font = "Times-Roman"
             bold_font = "Times-Bold"
             italic_font = "Times-Italic"
-            bold_italic_font = "Times-BoldItalic"
             heading_font = "Times-Bold"
             base_pt = 9.8
             base_lead = 11.6
@@ -830,7 +827,6 @@ ORIGINAL TEXT:
             base_font = "Times-Roman"
             bold_font = "Times-Bold"
             italic_font = "Times-Italic"
-            bold_italic_font = "Times-BoldItalic"
             heading_font = "Times-Bold"
             base_pt = 10.2
             base_lead = 12.2
@@ -843,7 +839,6 @@ ORIGINAL TEXT:
             base_font = "Times-Roman"
             bold_font = "Times-Bold"
             italic_font = "Times-Italic"
-            bold_italic_font = "Times-BoldItalic"
             heading_font = "Helvetica-Bold"
             base_pt = 9.4
             base_lead = 11.2
@@ -857,7 +852,6 @@ ORIGINAL TEXT:
             base_font = "Times-Roman"
             bold_font = "Times-Bold"
             italic_font = "Times-Italic"
-            bold_italic_font = "Times-BoldItalic"
             heading_font = "Times-Bold"
             base_pt = 10.0
             base_lead = 12.4
@@ -871,7 +865,6 @@ ORIGINAL TEXT:
             base_font = "Times-Roman"
             bold_font = "Times-Bold"
             italic_font = "Times-Italic"
-            bold_italic_font = "Times-BoldItalic"
             heading_font = "Helvetica-Bold"
             base_pt = 10.4
             base_lead = 13.0
@@ -880,7 +873,7 @@ ORIGINAL TEXT:
         # Apply continuous density_scale to font sizes, leading, and spacing
         s_factor = max(0.65, min(1.55, density_scale))
         body_pt = max(7.2, min(13.5, base_pt * (s_factor ** 0.55)))
-        body_lead = max(body_pt * 1.08, body_lead_raw := base_lead * s_factor)
+        body_lead = max(body_pt * 1.08, base_lead * s_factor)
         para_space = max(2.0, min(14.0, 4.5 * s_factor))
 
         page_w, page_h = pagesize

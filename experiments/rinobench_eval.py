@@ -84,7 +84,7 @@ def run_rinobench_evaluation(n_samples: int = 300) -> Dict[str, Any]:
         json.dump(report, f, indent=2)
 
     print("\n=== RINoBench Calibration Results ===")
-    print(f"Spearman Rank Correlation (ρ): {spearman_rho:.4f} (p={p_val:.2e})")
+    print(f"Spearman Rank Correlation (rho): {spearman_rho:.4f} (p={p_val:.2e})")
     print(f"Calibrated Isotonic MSE:        {calibrated_mse:.4f}")
     print(f"Majority Baseline MSE:          {majority_mse:.4f}")
     print(f"MSE Error Reduction:            {mse_reduction_pct:.2f}%")

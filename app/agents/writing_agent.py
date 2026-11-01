@@ -14,7 +14,6 @@ from typing import Any, Dict, List, Optional, Tuple
 
 from app.agents.similarity_agent import similarity_citation_agent
 from app.clients.groq_client import groq_client
-from app.clients.semantic_scholar import s2_client
 from app.config import settings
 from app.models.schemas import Paper, PaperDraft, PaperDraftSection
 from app.services.embedding_service import embedding_service

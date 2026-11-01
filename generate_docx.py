@@ -1,11 +1,12 @@
 import os
-import docx
+
 from docx import Document
-from docx.shared import Inches, Pt, RGBColor
+from docx.enum.table import WD_ALIGN_VERTICAL, WD_TABLE_ALIGNMENT
 from docx.enum.text import WD_ALIGN_PARAGRAPH
-from docx.enum.table import WD_TABLE_ALIGNMENT, WD_ALIGN_VERTICAL
 from docx.oxml import OxmlElement
 from docx.oxml.ns import qn
+from docx.shared import Inches, Pt, RGBColor
+
 
 def set_cell_background(cell, fill_hex):
     tcPr = cell._tc.get_or_add_tcPr()
@@ -260,11 +261,11 @@ def create_paper_docx(output_path):
             cell.width = col_widths[col_idx]
             cell.vertical_alignment = WD_ALIGN_VERTICAL.CENTER
             set_cell_margins(cell, top=80, bottom=80, left=100, right=100)
-            
+
             p = cell.paragraphs[0]
             p.paragraph_format.space_after = Pt(0)
             p.paragraph_format.line_spacing = 1.0
-            
+
             if row_idx == 0:
                 set_cell_background(cell, "EAE6E1")
                 r = p.add_run(text)

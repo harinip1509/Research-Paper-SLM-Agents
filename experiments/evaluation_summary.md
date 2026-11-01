@@ -1,5 +1,5 @@
 # ScholarForge: Comprehensive Empirical Evaluation Summary
-*Generated automatically by `experiments/run_all.py` in 0.2s*
+*Generated automatically by `experiments/run_all.py` in 2.75s*
 
 All reported metrics below originate strictly from empirical experiment scripts and non-parametric bootstrap resampling (1,000 resamples). Zero numbers are fabricated.
 

@@ -104,8 +104,8 @@ def run_plan_evaluation(n_samples: int = 2000) -> Dict[str, Any]:
 
     print("\n=== Plan Generation Benchmark Results ===")
     print(f"Flat Prompted:         Rubric={report['models']['flat_prompted']['mean_rubric_score']:.3f}")
-    print(f"Decompose-then-Plan:   Rubric={report['models']['decompose_then_plan']['mean_rubric_score']:.3f} (Δ=+{mean_gain_decompose:.3f}, 95% CI: [{low_decompose}, {high_decompose}])")
-    print(f"LoRA fine-tuned:       Rubric={report['models']['lora_research_plan_gen']['mean_rubric_score']:.3f} (Δ=+{mean_gain_lora:.3f}, 95% CI: [{low_lora}, {high_lora}])")
+    print(f"Decompose-then-Plan:   Rubric={report['models']['decompose_then_plan']['mean_rubric_score']:.3f} (Delta=+{mean_gain_decompose:.3f}, 95% CI: [{low_decompose}, {high_decompose}])")
+    print(f"LoRA fine-tuned:       Rubric={report['models']['lora_research_plan_gen']['mean_rubric_score']:.3f} (Delta=+{mean_gain_lora:.3f}, 95% CI: [{low_lora}, {high_lora}])")
     print(f"Selected Strategy:     '{report['shipping_decision']['selected_strategy']}'")
 
     return report
