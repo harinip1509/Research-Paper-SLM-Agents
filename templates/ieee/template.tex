@@ -48,7 +48,15 @@
 {{ ai_disclosure }}
 {% endif %}
 
+{% if bib_items %}
+\begin{thebibliography}{99}
+{% for item in bib_items %}
+\bibitem{ {{- item.key -}} } {{ item.formatted }}
+{% endfor %}
+\end{thebibliography}
+{% else %}
 \bibliographystyle{IEEEtran}
 \bibliography{references}
+{% endif %}
 
 \end{document}

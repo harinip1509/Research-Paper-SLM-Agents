@@ -1,44 +1,77 @@
 @import "tailwindcss";
 
 :root {
-  --color-navy: #0f1f3d;
-  --color-navy-hover: #162a52;
-  --color-accent: #2563eb;
-  --color-border: #e2e8f0;
+  --bg-canvas: #FAF7F2;
+  --bg-linen: #F3ECE2;
+  --bg-sand: #EFE6DA;
+  --bg-card: #FFFFFF;
+  --espresso-primary: #3D281D;
+  --espresso-hover: #2B1B12;
+  --bronze-accent: #8C6B4F;
+  --champagne-soft: #EADFD2;
+  --text-primary: #261C16;
+  --text-secondary: #6E6055;
+  --text-muted: #8C7D70;
+  --border-stone: #E6DDD0;
 }
 
 body {
-  background-color: #f8fafc;
-  color: #0f172a;
-  font-family: 'Source Sans 3', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  background-color: #FAF7F2;
+  color: #261C16;
+  font-family: 'Plus Jakarta Sans', 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
+.font-display {
+  font-family: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+  letter-spacing: -0.01em;
+}
+
 .font-serif {
-  font-family: 'Lora', Georgia, Cambria, 'Times New Roman', Times, serif;
+  font-family: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
 }
 
 .font-sans {
-  font-family: 'Source Sans 3', system-ui, -apple-system, sans-serif;
+  font-family: 'Plus Jakarta Sans', 'Inter', system-ui, -apple-system, sans-serif;
 }
 
 .font-mono {
   font-family: 'JetBrains Mono', ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
 }
 
-/* Custom scrollbars matching university theme */
+/* Warm espresso-bronze hero backdrop inspired by editorial reference */
+.bg-espresso-hero {
+  background:
+    radial-gradient(circle at 78% 28%, rgba(186, 152, 122, 0.32) 0%, transparent 52%),
+    radial-gradient(circle at 18% 80%, rgba(54, 36, 25, 0.45) 0%, transparent 58%),
+    linear-gradient(135deg, #6E543E 0%, #4A3728 52%, #7D614B 100%);
+}
+
+/* Subtle warm ambient surface for app workspace */
+.bg-ivory-canvas {
+  background: radial-gradient(circle at 50% 0%, #FDFBF7 0%, #FAF7F2 65%, #F5EFE6 100%);
+}
+
+/* Soft editorial card elevation */
+.editorial-card {
+  background-color: #FFFFFF;
+  border: 1px solid #E6DDD0;
+  box-shadow: 0 2px 14px rgba(61, 40, 29, 0.035);
+}
+
+/* Custom scrollbars matching warm stone aesthetic */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #f1f5f9;
+  background: #FAF7F2;
 }
 ::-webkit-scrollbar-thumb {
-  background: #cbd5e1;
-  border-radius: 3px;
+  background: #D8CBB8;
+  border-radius: 9999px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #94a3b8;
+  background: #B8A690;
 }

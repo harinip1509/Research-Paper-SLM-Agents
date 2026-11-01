@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react'
+import { Menu, FolderPlus, Key, ArrowUpRight } from 'lucide-react'
 import { Sidebar, NavView } from './components/Sidebar'
 import { DashboardView } from './components/DashboardView'
 import { ResearchProjectView } from './components/ResearchProjectView'
@@ -16,17 +17,19 @@ export default function App() {
   const [user, setUser] = useState<User | null>(null)
   const [isLanding, setIsLanding] = useState(true)
   const [currentNav, setCurrentNav] = useState<NavView>('dashboard')
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   const [authModalOpen, setAuthModalOpen] = useState(false)
   const [authMode, setAuthMode] = useState<'login' | 'signup'>('login')
   const [settingsOpen, setSettingsOpen] = useState(false)
 
-  // Shared Research State across 7 agents - Clean defaults (no hardcoding)
+  // Shared Research State across agents
   const [projectId, setProjectId] = useState<string | null>(null)
   const [title, setTitle] = useState('')
   const [abstract, setAbstract] = useState('')
   const [userNotes, setUserNotes] = useState('')
   const [venue, setVenue] = useState('ieee')
+  const [targetPages, setTargetPages] = useState(6)
   const [papers, setPapers] = useState<Paper[]>([])
   const [uniqueness, setUniqueness] = useState<TopicUniquenessResponse | null>(null)
   const [draft, setDraft] = useState<PaperDraft | null>(null)
@@ -80,7 +83,12 @@ export default function App() {
       setUserNotes(p.user_notes || '')
       setVenue(p.venue || 'ieee')
       if (p.papers) setPapers(p.papers)
-      if (p.draft) setDraft(p.draft)
+      if (p.draft) {
+        setDraft(p.draft)
+        if (p.draft.target_pages) {
+          setTargetPages(p.draft.target_pages)
+        }
+      }
       if (p.uniqueness_score != null) {
         setUniqueness({
           title: p.title,
@@ -119,6 +127,7 @@ export default function App() {
     setAbstract('')
     setUserNotes('')
     setVenue('ieee')
+    setTargetPages(6)
     setPapers([])
     setUniqueness(null)
     setDraft(null)
@@ -151,16 +160,22 @@ export default function App() {
   }
 
   const stageNames: Record<NavView, string> = {
-    dashboard: 'Research Dashboard',
-    project: 'Research Topic',
-    'agent-status': 'Academic Search & Literature',
-    workspace: 'Paper Writing',
-    'final-check': 'Topic Uniqueness & Similarity',
-    'final-report': 'Final Paper Export',
+    dashboard: 'Research Studio Overview',
+    project: 'Project Configuration',
+    'agent-status': 'Literature & Agent Pipeline',
+    workspace: 'Manuscript Workspace',
+    'final-check': 'Novelty & Citation Audit',
+    'final-report': 'Venue Formatting & Export',
   }
 
+  const computedCitationCount =
+    draft?.bibtex_entries?.length ||
+    draft?.citation_verifications?.length ||
+    (draft?.bibtex_content ? (draft.bibtex_content.match(/@\w+\s*\{/g) || []).length : 0) ||
+    papers.length
+
   return (
-    <div className="min-h-screen bg-[#f8fafc] text-slate-900 font-sans flex flex-col">
+    <div className="min-h-screen bg-[#FAF7F2] text-[#261C16] font-sans flex flex-col">
       {isLanding ? (
         <LandingPage
           user={user}
@@ -169,7 +184,7 @@ export default function App() {
         />
       ) : (
         <div className="flex-1 flex min-h-screen">
-          {/* Exact Figma Navy Sidebar */}
+          {/* Warm Editorial Sidebar */}
           <Sidebar
             currentView={currentNav}
             onNavigate={setCurrentNav}
@@ -178,83 +193,153 @@ export default function App() {
             onLogout={handleLogout}
             onGoToLanding={() => setIsLanding(true)}
             onOpenSettings={() => setSettingsOpen(true)}
+            mobileOpen={mobileMenuOpen}
+            onCloseMobile={() => setMobileMenuOpen(false)}
           />
 
-          {/* Main University-style Content Area */}
-          <main className="flex-1 p-6 sm:p-10 overflow-y-auto">
-            {currentNav === 'dashboard' && (
-              <DashboardView
-                onNavigate={setCurrentNav}
-                currentStageName={stageNames[currentNav]}
-                papersCount={papers.length}
-                uniquenessScore={uniqueness ? uniqueness.uniqueness_score : null}
-                citationCount={draft?.bibtex_entries?.length || 0}
-                projects={projects}
-                onSelectProject={handleSelectProject}
-                onNewProject={handleNewProject}
-                onDeleteProject={handleDeleteProject}
-                onApplyPreset={handleApplyPreset}
-                onOpenSettings={() => setSettingsOpen(true)}
-              />
-            )}
+          {/* Main Content Column */}
+          <div className="flex-1 flex flex-col min-w-0 bg-[#FAF7F2]">
+            {/* Top Editorial Bar */}
+            <header className="h-16 border-b border-[#E6DDD0] bg-[#FAF7F2]/90 backdrop-blur-md sticky top-0 z-30 px-6 sm:px-10 flex items-center justify-between">
+              <div className="flex items-center gap-4 min-w-0">
+                <button
+                  onClick={() => setMobileMenuOpen(true)}
+                  className="lg:hidden p-2 rounded-full bg-[#F3ECE2] border border-[#E6DDD0] text-[#6E6055] hover:text-[#261C16]"
+                >
+                  <Menu className="w-4 h-4" />
+                </button>
+                <div className="flex items-center gap-2.5 truncate">
+                  <span className="font-display text-lg font-semibold text-[#261C16] truncate">
+                    {stageNames[currentNav]}
+                  </span>
+                  {title && (
+                    <>
+                      <span className="hidden md:inline text-[#C8B29B]">•</span>
+                      <span className="hidden md:inline text-xs text-[#8C7D70] truncate max-w-[280px]">
+                        {title}
+                      </span>
+                    </>
+                  )}
+                </div>
+              </div>
 
-            {currentNav === 'project' && (
-              <ResearchProjectView
-                onNavigate={setCurrentNav}
-                projectId={projectId}
-                title={title}
-                setTitle={setTitle}
-                abstract={abstract}
-                setAbstract={setAbstract}
-                userNotes={userNotes}
-                setUserNotes={setUserNotes}
-                venue={venue}
-                setVenue={setVenue}
-                setPapers={setPapers}
-                setUniqueness={setUniqueness}
-                setDraft={setDraft}
-                onProjectSaved={(newId) => {
-                  setProjectId(newId)
-                  refreshProjects()
-                }}
-              />
-            )}
+              <div className="flex items-center gap-2.5">
+                <button
+                  onClick={() => setSettingsOpen(true)}
+                  className="px-4 py-2 rounded-full bg-white hover:bg-[#F3ECE2] border border-[#E6DDD0] text-[#4A3728] text-xs font-medium transition-colors flex items-center gap-1.5 shadow-2xs"
+                >
+                  <Key className="w-3.5 h-3.5 text-[#8C6B4F]" />
+                  <span className="hidden sm:inline">API &amp; Keys</span>
+                </button>
+                <div className="inline-flex items-center gap-1">
+                  <button
+                    onClick={handleNewProject}
+                    className="px-4 py-2 rounded-full bg-[#3D281D] hover:bg-[#2B1B12] text-[#FAF7F2] text-xs font-medium transition-colors flex items-center gap-1.5 shadow-2xs"
+                  >
+                    <FolderPlus className="w-3.5 h-3.5 text-[#EADFD2]" />
+                    <span>New Manuscript</span>
+                  </button>
+                  <button
+                    onClick={handleNewProject}
+                    aria-label="New Manuscript"
+                    className="hidden sm:flex w-8 h-8 rounded-full bg-[#EADFD2] hover:bg-[#DFD0BE] text-[#3D281D] items-center justify-center transition-colors"
+                  >
+                    <ArrowUpRight className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+              </div>
+            </header>
 
-            {currentNav === 'agent-status' && (
-              <AgentStatusView
-                onNavigate={setCurrentNav}
-                papers={papers}
-                uniqueness={uniqueness}
-                draft={draft}
-              />
-            )}
+            <main className="flex-1 p-6 sm:p-10 overflow-y-auto bg-ivory-canvas">
+              {currentNav === 'dashboard' && (
+                <DashboardView
+                  onNavigate={setCurrentNav}
+                  currentStageName={stageNames[currentNav]}
+                  papersCount={papers.length}
+                  uniquenessScore={uniqueness ? uniqueness.uniqueness_score : null}
+                  citationCount={computedCitationCount}
+                  projects={projects}
+                  onSelectProject={handleSelectProject}
+                  onNewProject={handleNewProject}
+                  onDeleteProject={handleDeleteProject}
+                  onApplyPreset={handleApplyPreset}
+                  onOpenSettings={() => setSettingsOpen(true)}
+                />
+              )}
 
-            {currentNav === 'workspace' && (
-              <PaperWorkspaceView
-                onNavigate={setCurrentNav}
-                draft={draft}
-              />
-            )}
+              {currentNav === 'project' && (
+                <ResearchProjectView
+                  onNavigate={setCurrentNav}
+                  projectId={projectId}
+                  title={title}
+                  setTitle={setTitle}
+                  abstract={abstract}
+                  setAbstract={setAbstract}
+                  userNotes={userNotes}
+                  setUserNotes={setUserNotes}
+                  venue={venue}
+                  setVenue={setVenue}
+                  targetPages={targetPages}
+                  setTargetPages={setTargetPages}
+                  setPapers={setPapers}
+                  setUniqueness={setUniqueness}
+                  setDraft={setDraft}
+                  onProjectSaved={(newId) => {
+                    setProjectId(newId)
+                    refreshProjects()
+                  }}
+                />
+              )}
 
-            {currentNav === 'final-check' && (
-              <FinalCheckView
-                onNavigate={setCurrentNav}
-                uniqueness={uniqueness}
-                papers={papers}
-              />
-            )}
+              {currentNav === 'agent-status' && (
+                <AgentStatusView
+                  onNavigate={setCurrentNav}
+                  papers={papers}
+                  uniqueness={uniqueness}
+                  draft={draft}
+                />
+              )}
 
-            {currentNav === 'final-report' && (
-              <FinalReportView
-                title={title}
-                abstract={abstract}
-                venue={venue}
-                draft={draft}
-                uniqueness={uniqueness}
-                onNavigate={setCurrentNav}
-              />
-            )}
-          </main>
+              {currentNav === 'workspace' && (
+                <PaperWorkspaceView
+                  onNavigate={setCurrentNav}
+                  draft={draft}
+                  setDraft={setDraft}
+                  title={title}
+                  abstract={abstract}
+                  userNotes={userNotes}
+                  papers={papers}
+                  venue={venue}
+                  setVenue={setVenue}
+                  targetPages={targetPages}
+                  setTargetPages={setTargetPages}
+                />
+              )}
+
+              {currentNav === 'final-check' && (
+                <FinalCheckView
+                  onNavigate={setCurrentNav}
+                  uniqueness={uniqueness}
+                  papers={papers}
+                  draft={draft}
+                />
+              )}
+
+              {currentNav === 'final-report' && (
+                <FinalReportView
+                  title={title}
+                  abstract={abstract}
+                  venue={venue}
+                  setVenue={setVenue}
+                  draft={draft}
+                  uniqueness={uniqueness}
+                  targetPages={targetPages}
+                  setTargetPages={setTargetPages}
+                  onNavigate={setCurrentNav}
+                />
+              )}
+            </main>
+          </div>
         </div>
       )}
 

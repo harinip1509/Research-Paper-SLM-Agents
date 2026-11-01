@@ -127,6 +127,8 @@ class SimilarityCitationAgent:
         known_papers: List[Paper],
     ) -> List[CitationVerificationResult]:
         r"""Extract all \cite{...} keys and verify provenance against Semantic Scholar metadata."""
+        from app.services.faiss_service import faiss_service
+
         # Find all citation keys: \cite{key1, key2}
         cite_matches = re.findall(r"\\cite\{([^}]+)\}", draft_text)
         found_keys: Set[str] = set()
@@ -137,21 +139,43 @@ class SimilarityCitationAgent:
         results: List[CitationVerificationResult] = []
         known_map: Dict[str, Paper] = {}
 
-        # Build lookup from known papers
-        for p in known_papers:
-            # Map by paper_id and generated bibtex key
+        def _make_bibtex(p: Paper, k: str) -> str:
+            authors_str = " and ".join(p.authors) if p.authors else "Anonymous"
+            venue_str = p.venue or "Conference Proceedings"
+            year_str = str(p.year or 2024)
+            url_str = p.url or (f"https://www.semanticscholar.org/paper/{p.paper_id}" if p.paper_id else "")
+            return (
+                f"@inproceedings{{{k},\n"
+                f"  author = {{{authors_str}}},\n"
+                f"  title = {{{p.title}}},\n"
+                f"  booktitle = {{{venue_str}}},\n"
+                f"  year = {{{year_str}}},\n"
+                f"  url = {{{url_str}}}\n"
+                f"}}"
+            )
+
+        # Build lookup from known papers and local FAISS index
+        used_counts: Dict[str, int] = {}
+        for p in list(known_papers) + list(getattr(faiss_service, "_papers", [])):
             author_last = p.authors[0].split()[-1] if p.authors else "Author"
-            author_last = "".join(ch for ch in author_last if ch.isalnum())
-            key_slug = f"{author_last}{p.year or 2024}"
-            known_map[key_slug.lower()] = p
-            known_map[p.paper_id.lower()] = p
+            author_last = "".join(ch for ch in author_last if ch.isalnum()) or "Author"
+            base_slug = f"{author_last}{p.year or 2024}".lower()
+            if base_slug not in known_map:
+                known_map[base_slug] = p
+                used_counts[base_slug] = 1
+            else:
+                idx = used_counts.get(base_slug, 1)
+                used_counts[base_slug] = idx + 1
+                suffix = chr(ord("a") + (idx - 1))
+                known_map[f"{base_slug}{suffix}"] = p
+            if p.paper_id:
+                known_map[p.paper_id.lower()] = p
 
         for key in sorted(found_keys):
             lower_key = key.lower()
-            matched_paper = known_map.get(lower_key)
+            matched_paper = known_map.get(lower_key) or known_map.get(lower_key.rstrip("abcdef"))
 
             if matched_paper:
-                # Verified against known retrieved papers
                 results.append(
                     CitationVerificationResult(
                         citation_key=key,
@@ -160,15 +184,26 @@ class SimilarityCitationAgent:
                         title=matched_paper.title,
                         year=matched_paper.year,
                         url=matched_paper.url or f"https://www.semanticscholar.org/paper/{matched_paper.paper_id}",
+                        bibtex_entry=_make_bibtex(matched_paper, key),
                         status_message="Verified against retrieved Semantic Scholar paper.",
                     )
                 )
             else:
-                # Attempt lookup via Semantic Scholar search
+                # Attempt lookup via Semantic Scholar search with strict author/year validation
                 try:
                     search_res = await s2_client.search_papers(key, limit=1)
-                    if search_res:
-                        p = search_res[0]
+                    p = search_res[0] if search_res else None
+                    # Verify that the candidate actually matches the citation key's author or year
+                    year_in_key = re.search(r"(\d{4})", key)
+                    expected_year = int(year_in_key.group(1)) if year_in_key else None
+                    author_prefix = re.sub(r"\d+.*$", "", key).lower()
+                    p_authors_lower = " ".join(p.authors).lower() if (p and p.authors) else ""
+                    is_valid_match = bool(
+                        p
+                        and (not expected_year or p.year == expected_year)
+                        and (not author_prefix or author_prefix in p_authors_lower or author_prefix in (p.title or "").lower())
+                    )
+                    if p and is_valid_match:
                         results.append(
                             CitationVerificationResult(
                                 citation_key=key,
@@ -177,6 +212,7 @@ class SimilarityCitationAgent:
                                 title=p.title,
                                 year=p.year,
                                 url=p.url,
+                                bibtex_entry=_make_bibtex(p, key),
                                 status_message="Resolved and verified via Semantic Scholar Graph API.",
                             )
                         )

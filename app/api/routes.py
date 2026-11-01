@@ -7,7 +7,7 @@ import uuid
 from typing import Any, Dict, List, Optional
 
 from fastapi import APIRouter, Header, HTTPException, Query
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, Response
 from pydantic import BaseModel
 
 from app.agents.formatting_agent import formatting_agent
@@ -166,6 +166,7 @@ async def draft_full_paper(req: DraftFullPaperRequest) -> PaperDraft:
 
 
 @router.get("/venues")
+@router.get("/format/venues")
 async def list_venues() -> Dict[str, Any]:
     """Return all declarative venue profiles from venues.yaml."""
     return formatting_agent.venues
@@ -178,12 +179,15 @@ class CheckConstraintsRequest(BaseModel):
     sections: List[Dict[str, str]]
     keywords: List[str] = []
     authors: List[Dict[str, str]] = []
-    is_anonymized: bool = False
+    is_anonymized: Optional[bool] = None
+    target_pages: Optional[int] = None
 
 
 @router.post("/format/check", response_model=FormatConstraintReport)
 async def check_venue_constraints(req: CheckConstraintsRequest) -> FormatConstraintReport:
     """Verify paper compliance against venue limits (words, abstract, keywords, anonymization)."""
+    venue_cfg = formatting_agent.get_venue(req.venue_id)
+    is_anon = req.is_anonymized if req.is_anonymized is not None else venue_cfg.get("anonymization_required", False)
     return formatting_agent.check_constraints(
         venue_id=req.venue_id,
         title=req.title,
@@ -191,7 +195,8 @@ async def check_venue_constraints(req: CheckConstraintsRequest) -> FormatConstra
         sections=req.sections,
         keywords=req.keywords,
         authors=req.authors,
-        is_anonymized=req.is_anonymized,
+        is_anonymized=is_anon,
+        target_pages=req.target_pages,
     )
 
 
@@ -208,13 +213,18 @@ async def render_latex_source(req: FormatExportRequest) -> Dict[str, str]:
 
 @router.post("/format/compile/pdf")
 async def compile_paper_pdf(req: FormatExportRequest):
-    """Compile paper to PDF and return download file."""
+    """Compile paper to venue-specific PDF calibrated to target_pages and return download file."""
     try:
         latex_src = formatting_agent.render_latex(req)
-        pdf_path = formatting_agent.compile_pdf(latex_src, req.bibtex)
+        pdf_path = formatting_agent.compile_pdf(
+            latex_src,
+            req.bibtex,
+            target_pages=req.target_pages,
+            request=req,
+        )
         return FileResponse(
             path=str(pdf_path),
-            filename=f"paper_{req.venue_id}.pdf",
+            filename=f"paper_{req.venue_id}_{req.target_pages or 6}pp.pdf",
             media_type="application/pdf",
         )
     except Exception as e:
@@ -224,17 +234,68 @@ async def compile_paper_pdf(req: FormatExportRequest):
 
 @router.post("/format/compile/docx")
 async def export_paper_docx(req: FormatExportRequest):
-    """Export paper to styled DOCX document."""
+    """Export paper to venue-specific styled DOCX document calibrated to target_pages."""
     try:
         docx_path = formatting_agent.export_docx(req)
         return FileResponse(
             path=str(docx_path),
-            filename=f"paper_{req.venue_id}.docx",
+            filename=f"paper_{req.venue_id}_{req.target_pages or 6}pp.docx",
             media_type="application/vnd.openxmlformats-officedocument.wordprocessingml.document",
         )
     except Exception as e:
         logger.exception("DOCX export error: %s", e)
         raise HTTPException(status_code=500, detail=f"DOCX export failed: {str(e)}")
+
+
+@router.post("/format/compile/tex")
+async def export_paper_tex(req: FormatExportRequest):
+    """Export paper to complete Jinja2 venue-formatted LaTeX (.tex) document."""
+    try:
+        latex_src = formatting_agent.render_latex(req)
+        return Response(
+            content=latex_src,
+            media_type="application/x-tex; charset=utf-8",
+            headers={
+                "Content-Disposition": f'attachment; filename="paper_{req.venue_id}_{req.target_pages or 6}pp.tex"'
+            },
+        )
+    except Exception as e:
+        logger.exception("LaTeX export error: %s", e)
+        raise HTTPException(status_code=500, detail=f"LaTeX export failed: {str(e)}")
+
+
+@router.post("/format/compile/markdown")
+async def export_paper_markdown(req: FormatExportRequest):
+    """Export paper to structured Markdown (.md) document calibrated to target_pages."""
+    try:
+        md_src = formatting_agent.render_markdown(req)
+        return Response(
+            content=md_src,
+            media_type="text/markdown; charset=utf-8",
+            headers={
+                "Content-Disposition": f'attachment; filename="paper_{req.venue_id}_{req.target_pages or 6}pp.md"'
+            },
+        )
+    except Exception as e:
+        logger.exception("Markdown export error: %s", e)
+        raise HTTPException(status_code=500, detail=f"Markdown export failed: {str(e)}")
+
+
+@router.post("/format/compile/html")
+async def export_paper_html(req: FormatExportRequest):
+    """Export paper to standalone conference-styled HTML (.html) document."""
+    try:
+        html_src = formatting_agent.render_html(req)
+        return Response(
+            content=html_src,
+            media_type="text/html; charset=utf-8",
+            headers={
+                "Content-Disposition": f'attachment; filename="paper_{req.venue_id}_{req.target_pages or 6}pp.html"'
+            },
+        )
+    except Exception as e:
+        logger.exception("HTML export error: %s", e)
+        raise HTTPException(status_code=500, detail=f"HTML export failed: {str(e)}")
 
 
 class CondenseRequest(BaseModel):

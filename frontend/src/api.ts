@@ -6,6 +6,7 @@ import {
   PaperDraft,
   ReviewCritique,
   SimilarityReport,
+  CitationVerificationResult,
   FormatConstraintReport,
   ProjectSummary,
 } from './types'
@@ -195,6 +196,22 @@ export async function apiCheckSimilarity(params: {
   return res.json()
 }
 
+export async function apiVerifyCitations(params: {
+  draft_text: string
+  known_papers: Paper[]
+}): Promise<CitationVerificationResult[]> {
+  const res = await fetch(`${API_BASE}/citations/verify`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
+    body: JSON.stringify(params),
+  })
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: 'Citation verification failed' }))
+    throw new Error(parseErrorMessage(err, 'Citation verification failed'))
+  }
+  return res.json()
+}
+
 export async function apiGetVenues(): Promise<Record<string, any>> {
   const res = await fetch(`${API_BASE}/format/venues`)
   if (!res.ok) throw new Error('Failed to load venue profiles')
@@ -208,8 +225,10 @@ export async function apiCheckConstraints(params: {
   abstract: string
   keywords: string[]
   sections: any[]
-  bibtex: string
+  bibtex?: string
   ai_disclosure_statement?: string
+  is_anonymized?: boolean
+  target_pages?: number
 }): Promise<FormatConstraintReport> {
   const res = await fetch(`${API_BASE}/format/check`, {
     method: 'POST',
@@ -219,6 +238,29 @@ export async function apiCheckConstraints(params: {
   if (!res.ok) {
     const err = await res.json().catch(() => ({ detail: 'Constraint check failed' }))
     throw new Error(parseErrorMessage(err, 'Constraint check failed'))
+  }
+  return res.json()
+}
+
+export async function apiRenderLatex(params: {
+  venue_id: string
+  title: string
+  authors: any[]
+  abstract: string
+  keywords: string[]
+  sections: any[]
+  bibtex: string
+  ai_disclosure_statement?: string
+  target_pages?: number
+}): Promise<{ venue_id: string; latex_source: string }> {
+  const res = await fetch(`${API_BASE}/format/render`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
+    body: JSON.stringify(params),
+  })
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: 'LaTeX rendering failed' }))
+    throw new Error(parseErrorMessage(err, 'LaTeX rendering failed'))
   }
   return res.json()
 }
@@ -265,6 +307,75 @@ export async function apiDownloadDocx(params: {
   if (!res.ok) {
     const err = await res.json().catch(() => ({ detail: 'DOCX generation failed' }))
     throw new Error(parseErrorMessage(err, 'DOCX generation failed'))
+  }
+  return res.blob()
+}
+
+export async function apiDownloadTex(params: {
+  venue_id: string
+  title: string
+  authors: any[]
+  abstract: string
+  keywords: string[]
+  sections: any[]
+  bibtex: string
+  ai_disclosure_statement?: string
+  target_pages?: number
+}): Promise<Blob> {
+  const res = await fetch(`${API_BASE}/format/compile/tex`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
+    body: JSON.stringify(params),
+  })
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: 'LaTeX export failed' }))
+    throw new Error(parseErrorMessage(err, 'LaTeX export failed'))
+  }
+  return res.blob()
+}
+
+export async function apiDownloadMarkdown(params: {
+  venue_id: string
+  title: string
+  authors: any[]
+  abstract: string
+  keywords: string[]
+  sections: any[]
+  bibtex: string
+  ai_disclosure_statement?: string
+  target_pages?: number
+}): Promise<Blob> {
+  const res = await fetch(`${API_BASE}/format/compile/markdown`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
+    body: JSON.stringify(params),
+  })
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: 'Markdown export failed' }))
+    throw new Error(parseErrorMessage(err, 'Markdown export failed'))
+  }
+  return res.blob()
+}
+
+export async function apiDownloadHtml(params: {
+  venue_id: string
+  title: string
+  authors: any[]
+  abstract: string
+  keywords: string[]
+  sections: any[]
+  bibtex: string
+  ai_disclosure_statement?: string
+  target_pages?: number
+}): Promise<Blob> {
+  const res = await fetch(`${API_BASE}/format/compile/html`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...getAuthHeader() },
+    body: JSON.stringify(params),
+  })
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({ detail: 'HTML export failed' }))
+    throw new Error(parseErrorMessage(err, 'HTML export failed'))
   }
   return res.blob()
 }

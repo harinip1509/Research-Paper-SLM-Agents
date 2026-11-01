@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { X, Mail, Lock, User, School, ArrowRight, AlertCircle, CheckCircle2 } from 'lucide-react'
+import { X, Mail, Lock, User, School, ArrowUpRight, AlertCircle, CheckCircle2 } from 'lucide-react'
 import { apiLogin, apiSignup } from '../api'
 import { User as UserType } from '../types'
 
@@ -71,64 +71,62 @@ export const AuthModal: React.FC<AuthModalProps> = ({
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs font-sans">
-      <div className="relative w-full max-w-md rounded-xl bg-white border border-[#e2e8f0] shadow-2xl p-6 sm:p-8">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#261C16]/45 backdrop-blur-xs font-sans">
+      <div className="relative w-full max-w-md rounded-3xl bg-[#FAF7F2] border border-[#E6DDD0] shadow-[0_24px_60px_rgba(38,28,22,0.22)] p-6 sm:p-8 text-[#261C16]">
         {/* Close Button */}
         <button
           onClick={onClose}
-          className="absolute top-5 right-5 p-1 rounded-md text-slate-400 hover:text-slate-600 hover:bg-slate-100 transition-colors"
+          className="absolute top-5 right-5 p-2 rounded-full text-[#8C7D70] hover:text-[#261C16] hover:bg-[#EADFD2] transition-colors"
         >
-          <X className="w-5 h-5" />
+          <X className="w-4 h-4" />
         </button>
 
         {/* Header */}
         <div className="mb-6">
-          <div className="text-[10px] font-mono tracking-widest text-[#2563eb] font-semibold uppercase mb-1">
-            ScholarForge AI Platform
+          <div className="text-[10px] tracking-[0.18em] text-[#8C6B4F] font-semibold uppercase mb-1">
+            ScholarForge Research Studio
           </div>
-          <h2 className="text-2xl font-bold font-serif text-slate-900">
-            {mode === 'signup' ? 'Create Researcher Account' : 'Sign In to Workspace'}
+          <h2 className="text-3xl font-display font-semibold text-[#261C16]">
+            {mode === 'signup' ? 'Create Scholar Account' : 'Sign In to Studio'}
           </h2>
-          <p className="text-xs text-slate-500 mt-1">
+          <p className="text-xs text-[#6E6055] mt-1">
             {mode === 'signup'
-              ? 'Register to persist conference drafts, citations, and export logs.'
-              : 'Sign in to access your multi-agent papers and venue audits.'}
+              ? 'Register to save conference manuscripts, bibliographies, and novelty audits.'
+              : 'Sign in to access your saved manuscripts and venue configurations.'}
           </p>
         </div>
 
         {/* Quick Demo Login Box */}
-        <div className="mb-5 p-3.5 rounded-lg bg-[#f8fafc] border border-[#e2e8f0] flex items-center justify-between">
+        <div className="mb-5 p-4 rounded-2xl bg-[#EFE6DA] border border-[#DFD3C3] flex items-center justify-between">
           <div>
-            <div className="text-xs font-semibold text-slate-900 flex items-center gap-1.5">
-              <CheckCircle2 className="w-3.5 h-3.5 text-[#2563eb]" />
-              <span>Instant Evaluator Demo</span>
+            <div className="text-xs font-semibold text-[#261C16] flex items-center gap-1.5">
+              <CheckCircle2 className="w-3.5 h-3.5 text-[#3D281D]" />
+              <span>Instant Evaluator Access</span>
             </div>
-            <div className="text-[11px] text-slate-500 font-mono mt-0.5">
-              Dr. Alex Vance (MIT CSAIL)
-            </div>
+            <div className="text-[11px] text-[#6E6055] mt-0.5">Dr. Alex Vance (MIT CSAIL)</div>
           </div>
           <button
             type="button"
             onClick={handleDemoLogin}
             disabled={loading}
-            className="px-3 py-1.5 rounded-md text-xs font-semibold text-white bg-[#2563eb] hover:bg-[#1d4ed8] transition-colors shadow-2xs"
+            className="px-4 py-1.5 rounded-full text-xs font-semibold text-[#FAF7F2] bg-[#3D281D] hover:bg-[#2B1B12] transition-colors"
           >
             1-Click Demo
           </button>
         </div>
 
         {/* Tab switch */}
-        <div className="flex rounded-lg bg-slate-100 p-1 border border-slate-200 mb-5 text-xs font-medium">
+        <div className="flex rounded-full bg-[#F3ECE2] p-1 border border-[#E6DDD0] mb-5 text-xs font-medium">
           <button
             type="button"
             onClick={() => {
               setMode('login')
               setError(null)
             }}
-            className={`flex-1 py-1.5 rounded-md transition-all ${
+            className={`flex-1 py-2 rounded-full transition-all ${
               mode === 'login'
-                ? 'bg-white text-slate-900 font-semibold shadow-2xs'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-white text-[#261C16] font-semibold shadow-2xs'
+                : 'text-[#6E6055] hover:text-[#261C16]'
             }`}
           >
             Sign In
@@ -139,10 +137,10 @@ export const AuthModal: React.FC<AuthModalProps> = ({
               setMode('signup')
               setError(null)
             }}
-            className={`flex-1 py-1.5 rounded-md transition-all ${
+            className={`flex-1 py-2 rounded-full transition-all ${
               mode === 'signup'
-                ? 'bg-white text-slate-900 font-semibold shadow-2xs'
-                : 'text-slate-600 hover:text-slate-900'
+                ? 'bg-white text-[#261C16] font-semibold shadow-2xs'
+                : 'text-[#6E6055] hover:text-[#261C16]'
             }`}
           >
             Register
@@ -150,8 +148,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
         </div>
 
         {error && (
-          <div className="mb-4 p-3 rounded-lg bg-rose-50 border border-rose-200 text-xs text-rose-700 flex items-start gap-2">
-            <AlertCircle className="w-4 h-4 shrink-0 text-rose-500 mt-0.5" />
+          <div className="mb-4 p-3.5 rounded-2xl bg-rose-50 border border-rose-200 text-xs text-rose-800 flex items-start gap-2">
+            <AlertCircle className="w-4 h-4 shrink-0 text-rose-600 mt-0.5" />
             <span>{error}</span>
           </div>
         )}
@@ -160,34 +158,34 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           {mode === 'signup' && (
             <>
               <div>
-                <label className="block text-[11px] font-mono uppercase tracking-wider text-slate-500 font-semibold mb-1.5">
+                <label className="block text-[11px] uppercase tracking-wider text-[#6E6055] font-semibold mb-1.5">
                   Full Name
                 </label>
                 <div className="relative">
-                  <User className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                  <User className="w-4 h-4 text-[#8C7D70] absolute left-3.5 top-3" />
                   <input
                     type="text"
                     required
                     placeholder="e.g. Prof. Alan Turing"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full pl-9 pr-3.5 py-2 rounded-lg border border-[#e2e8f0] text-sm text-slate-900 focus:outline-none focus:border-[#2563eb]"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-white border border-[#E6DDD0] text-sm text-[#261C16] placeholder-[#8C7D70] focus:outline-none focus:border-[#8C6B4F]"
                   />
                 </div>
               </div>
 
               <div>
-                <label className="block text-[11px] font-mono uppercase tracking-wider text-slate-500 font-semibold mb-1.5">
+                <label className="block text-[11px] uppercase tracking-wider text-[#6E6055] font-semibold mb-1.5">
                   Institution / Affiliation
                 </label>
                 <div className="relative">
-                  <School className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+                  <School className="w-4 h-4 text-[#8C7D70] absolute left-3.5 top-3" />
                   <input
                     type="text"
                     placeholder="e.g. Stanford AI Lab / MIT EECS"
                     value={institution}
                     onChange={(e) => setInstitution(e.target.value)}
-                    className="w-full pl-9 pr-3.5 py-2 rounded-lg border border-[#e2e8f0] text-sm text-slate-900 focus:outline-none focus:border-[#2563eb]"
+                    className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-white border border-[#E6DDD0] text-sm text-[#261C16] placeholder-[#8C7D70] focus:outline-none focus:border-[#8C6B4F]"
                   />
                 </div>
               </div>
@@ -195,35 +193,35 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           )}
 
           <div>
-            <label className="block text-[11px] font-mono uppercase tracking-wider text-slate-500 font-semibold mb-1.5">
+            <label className="block text-[11px] uppercase tracking-wider text-[#6E6055] font-semibold mb-1.5">
               Academic Email
             </label>
             <div className="relative">
-              <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+              <Mail className="w-4 h-4 text-[#8C7D70] absolute left-3.5 top-3" />
               <input
                 type="email"
                 required
                 placeholder="researcher@university.edu"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full pl-9 pr-3.5 py-2 rounded-lg border border-[#e2e8f0] text-sm text-slate-900 focus:outline-none focus:border-[#2563eb]"
+                className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-white border border-[#E6DDD0] text-sm text-[#261C16] placeholder-[#8C7D70] focus:outline-none focus:border-[#8C6B4F]"
               />
             </div>
           </div>
 
           <div>
-            <label className="block text-[11px] font-mono uppercase tracking-wider text-slate-500 font-semibold mb-1.5">
+            <label className="block text-[11px] uppercase tracking-wider text-[#6E6055] font-semibold mb-1.5">
               Password
             </label>
             <div className="relative">
-              <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-3" />
+              <Lock className="w-4 h-4 text-[#8C7D70] absolute left-3.5 top-3" />
               <input
                 type="password"
                 required
                 placeholder="••••••••"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                className="w-full pl-9 pr-3.5 py-2 rounded-lg border border-[#e2e8f0] text-sm text-slate-900 focus:outline-none focus:border-[#2563eb]"
+                className="w-full pl-10 pr-4 py-2.5 rounded-2xl bg-white border border-[#E6DDD0] text-sm text-[#261C16] placeholder-[#8C7D70] focus:outline-none focus:border-[#8C6B4F]"
               />
             </div>
           </div>
@@ -231,14 +229,14 @@ export const AuthModal: React.FC<AuthModalProps> = ({
           <button
             type="submit"
             disabled={loading}
-            className="w-full mt-2 py-2.5 rounded-lg text-xs font-semibold text-white bg-[#0f1f3d] hover:bg-[#162a52] transition-colors flex items-center justify-center gap-2 shadow-sm disabled:opacity-50"
+            className="w-full mt-2 py-3 rounded-full text-xs font-semibold text-[#FAF7F2] bg-[#3D281D] hover:bg-[#2B1B12] transition-colors flex items-center justify-center gap-2 disabled:opacity-50"
           >
             {loading ? (
-              <span className="w-3.5 h-3.5 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+              <span className="w-4 h-4 border-2 border-[#FAF7F2]/30 border-t-[#FAF7F2] rounded-full animate-spin" />
             ) : (
               <>
-                <span>{mode === 'signup' ? 'Complete Registration' : 'Sign In'}</span>
-                <ArrowRight className="w-3.5 h-3.5" />
+                <span>{mode === 'signup' ? 'Complete Registration' : 'Enter Studio'}</span>
+                <ArrowUpRight className="w-4 h-4" />
               </>
             )}
           </button>

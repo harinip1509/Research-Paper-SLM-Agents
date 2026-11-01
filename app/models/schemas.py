@@ -97,27 +97,6 @@ class PaperDraftSection(BaseModel):
     word_count: int = Field(default=0)
 
 
-class PaperDraft(BaseModel):
-    title: str
-    abstract: str
-    sections: List[PaperDraftSection]
-    bibtex_content: str
-    total_word_count: int
-    target_pages: Optional[int] = Field(default=6, description="User requested target page count")
-
-
-class ReviewCritique(BaseModel):
-    novelty_score: float = Field(ge=1.0, le=5.0)
-    soundness_score: float = Field(ge=1.0, le=5.0)
-    clarity_score: float = Field(ge=1.0, le=5.0)
-    missing_work_score: float = Field(ge=1.0, le=5.0)
-    overall_score: float = Field(ge=1.0, le=5.0)
-    strengths: List[str]
-    weaknesses: List[str]
-    actionable_suggestions: List[str]
-    disclaimer: str = Field(default="Automated critique, not a peer review verdict.")
-
-
 class CitationVerificationResult(BaseModel):
     citation_key: str
     verified: bool
@@ -142,6 +121,31 @@ class SimilarityReport(BaseModel):
     high_similarity_matches: List[SentenceOverlapMatch]
     total_sentences_checked: int
     is_flagged: bool
+
+
+class PaperDraft(BaseModel):
+    title: str
+    abstract: str
+    sections: List[PaperDraftSection]
+    bibtex_content: str
+    bibtex_entries: List[str] = Field(default_factory=list, description="Individual BibTeX entries for each cited paper")
+    citation_verifications: List[CitationVerificationResult] = Field(default_factory=list, description="Agent 6 citation provenance verification results")
+    similarity_report: Optional[SimilarityReport] = Field(default=None, description="Agent 6 sentence-level overlap report")
+    total_word_count: int
+    target_pages: Optional[int] = Field(default=6, description="User requested target page count")
+
+
+class ReviewCritique(BaseModel):
+    novelty_score: float = Field(ge=1.0, le=5.0)
+    soundness_score: float = Field(ge=1.0, le=5.0)
+    clarity_score: float = Field(ge=1.0, le=5.0)
+    missing_work_score: float = Field(ge=1.0, le=5.0)
+    overall_score: float = Field(ge=1.0, le=5.0)
+    strengths: List[str]
+    weaknesses: List[str]
+    actionable_suggestions: List[str]
+    disclaimer: str = Field(default="Automated critique, not a peer review verdict.")
+
 
 
 class FormatExportRequest(BaseModel):

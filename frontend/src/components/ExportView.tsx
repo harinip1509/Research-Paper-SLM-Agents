@@ -7,7 +7,6 @@ import {
   FileText,
   FileCode,
   ShieldCheck,
-  Sparkles,
 } from 'lucide-react'
 import { apiCheckConstraints, apiExportFormat, apiGetVenues } from '../api'
 import { PaperDraft, FormatConstraintReport } from '../types'
@@ -120,18 +119,17 @@ export const ExportView: React.FC<ExportViewProps> = ({
   return (
     <div className="space-y-8 max-w-5xl mx-auto">
       <div>
-        <h2 className="text-2xl font-bold text-white flex items-center gap-2.5">
-          <FileCheck className="w-6 h-6 text-purple-400" />
+        <h2 className="text-2xl font-display font-semibold text-[#F1F5F2] flex items-center gap-2.5">
+          <FileCheck className="w-6 h-6 text-[#22C55E]" />
           <span>Agent 7: Venue Constraints & Deterministic Export</span>
         </h2>
-        <p className="text-sm text-slate-400 mt-1">
+        <p className="text-sm text-[#A6B5AB] mt-1">
           Verify page limits, word budgets, anonymization, and render deterministic LaTeX Jinja2 templates.
         </p>
       </div>
 
-      {/* Venue Selector */}
-      <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
-        <label className="block text-xs font-semibold text-slate-300 uppercase tracking-wider">
+      <div className="p-6 rounded-lg bg-[#14221B] border border-[#2A3D32] space-y-4">
+        <label className="block text-xs font-semibold text-[#A6B5AB] uppercase tracking-wider">
           Select Conference Venue Profile
         </label>
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
@@ -148,14 +146,14 @@ export const ExportView: React.FC<ExportViewProps> = ({
                 setVenue(v.id)
                 setReport(null)
               }}
-              className={`p-3 rounded-xl border text-left transition-all ${
+              className={`p-3 rounded border text-left transition-all ${
                 venue === v.id
-                  ? 'bg-indigo-600 text-white border-indigo-500 shadow-md'
-                  : 'bg-slate-950/80 border-slate-800 text-slate-300 hover:border-slate-700'
+                  ? 'bg-[#14532D]/60 text-[#F1F5F2] border-[#22C55E]'
+                  : 'bg-[#0D1713] border-[#2A3D32] text-[#A6B5AB] hover:border-[#81958A]'
               }`}
             >
               <div className="font-semibold text-xs">{v.name}</div>
-              <div className={`text-[10px] mt-0.5 ${venue === v.id ? 'text-indigo-200' : 'text-slate-500'}`}>
+              <div className={`text-[10px] mt-0.5 ${venue === v.id ? 'text-[#86EFAC]' : 'text-[#81958A]'}`}>
                 {v.desc}
               </div>
             </button>
@@ -163,19 +161,19 @@ export const ExportView: React.FC<ExportViewProps> = ({
         </div>
 
         {activeProfile.name && (
-          <div className="p-3.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-300 grid grid-cols-2 sm:grid-cols-4 gap-2">
+          <div className="p-3.5 rounded bg-[#0D1713] border border-[#2A3D32] text-xs text-[#A6B5AB] grid grid-cols-2 sm:grid-cols-4 gap-2">
             <div>
-              <span className="text-slate-500">Max Pages:</span> {activeProfile.page_limit_main || 'Unlimited'}
+              <span className="text-[#81958A]">Max Pages:</span> {activeProfile.page_limit_main || 'Unlimited'}
             </div>
             <div>
-              <span className="text-slate-500">Max Abstract:</span> {activeProfile.abstract_word_limit || 250} words
+              <span className="text-[#81958A]">Max Abstract:</span> {activeProfile.abstract_word_limit || 250} words
             </div>
             <div>
-              <span className="text-slate-500">Double-Blind:</span>{' '}
+              <span className="text-[#81958A]">Double-Blind:</span>{' '}
               {activeProfile.anonymization_required ? 'Required' : 'Optional'}
             </div>
             <div>
-              <span className="text-slate-500">AI Disclosure:</span>{' '}
+              <span className="text-[#81958A]">AI Disclosure:</span>{' '}
               {activeProfile.ai_use_disclosure_required ? 'Required' : 'Optional'}
             </div>
           </div>
@@ -185,10 +183,10 @@ export const ExportView: React.FC<ExportViewProps> = ({
           <button
             onClick={handleCheckConstraints}
             disabled={loadingCheck || !draft}
-            className="px-5 py-2.5 rounded-xl font-semibold text-xs text-white bg-indigo-600 hover:bg-indigo-500 shadow-md transition-all flex items-center gap-2 disabled:opacity-50"
+            className="px-5 py-2.5 rounded font-semibold text-xs text-[#0D1713] bg-[#22C55E] hover:bg-[#16a34a] transition-all flex items-center gap-2 disabled:opacity-50"
           >
             {loadingCheck ? (
-              <span className="w-4 h-4 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+              <span className="w-4 h-4 border-2 border-[#0D1713]/25 border-t-[#0D1713] rounded-full animate-spin" />
             ) : (
               <ShieldCheck className="w-4 h-4" />
             )}
@@ -198,31 +196,30 @@ export const ExportView: React.FC<ExportViewProps> = ({
       </div>
 
       {error && (
-        <div className="p-3 rounded-xl bg-rose-500/10 border border-rose-500/20 text-xs text-rose-300">
+        <div className="p-3 rounded bg-rose-950/50 border border-rose-800/50 text-xs text-rose-300">
           {error}
         </div>
       )}
 
       {exportSuccess && (
-        <div className="p-3 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-xs text-emerald-300 flex items-center gap-2">
-          <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+        <div className="p-3 rounded bg-[#14532D]/50 border border-[#22C55E]/40 text-xs text-[#86EFAC] flex items-center gap-2">
+          <CheckCircle2 className="w-4 h-4 text-[#22C55E]" />
           <span>{exportSuccess}</span>
         </div>
       )}
 
-      {/* Constraints Report */}
       {report && (
-        <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4 animate-fade-in">
-          <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-            <h3 className="text-sm font-semibold text-white flex items-center gap-2">
-              <FileCheck className="w-4 h-4 text-purple-400" />
+        <div className="p-6 rounded-lg bg-[#14221B] border border-[#2A3D32] space-y-4">
+          <div className="flex items-center justify-between pb-3 border-b border-[#2A3D32]">
+            <h3 className="text-sm font-semibold text-[#F1F5F2] flex items-center gap-2">
+              <FileCheck className="w-4 h-4 text-[#22C55E]" />
               <span>Constraint Audit: {report.venue_name}</span>
             </h3>
             <span
-              className={`text-xs px-2.5 py-0.5 rounded-full font-semibold ${
+              className={`text-xs px-2.5 py-0.5 rounded font-semibold ${
                 report.passed
-                  ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30'
-                  : 'bg-rose-500/15 text-rose-400 border border-rose-500/30'
+                  ? 'bg-[#14532D]/50 text-[#86EFAC] border border-[#22C55E]/40'
+                  : 'bg-rose-950/50 text-rose-300 border border-rose-800/40'
               }`}
             >
               {report.passed ? 'All Venue Constraints Satisfied' : 'Violations Flagged'}
@@ -230,30 +227,30 @@ export const ExportView: React.FC<ExportViewProps> = ({
           </div>
 
           <div className="grid grid-cols-3 gap-4 text-center">
-            <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
-              <div className="text-xs text-slate-400">Total Words</div>
-              <div className="text-lg font-bold text-white mt-1">{report.word_count}</div>
+            <div className="p-3 rounded bg-[#0D1713] border border-[#2A3D32]">
+              <div className="text-xs text-[#81958A]">Total Words</div>
+              <div className="text-lg font-bold text-[#F1F5F2] mt-1">{report.word_count}</div>
             </div>
-            <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
-              <div className="text-xs text-slate-400">Abstract Words</div>
-              <div className="text-lg font-bold text-cyan-400 mt-1">{report.abstract_words}</div>
+            <div className="p-3 rounded bg-[#0D1713] border border-[#2A3D32]">
+              <div className="text-xs text-[#81958A]">Abstract Words</div>
+              <div className="text-lg font-bold text-[#86EFAC] mt-1">{report.abstract_words}</div>
             </div>
-            <div className="p-3 rounded-xl bg-slate-950 border border-slate-800">
-              <div className="text-xs text-slate-400">Estimated Pages</div>
-              <div className="text-lg font-bold text-indigo-400 mt-1">{report.estimated_pages}</div>
+            <div className="p-3 rounded bg-[#0D1713] border border-[#2A3D32]">
+              <div className="text-xs text-[#81958A]">Estimated Pages</div>
+              <div className="text-lg font-bold text-[#22C55E] mt-1">{report.estimated_pages}</div>
             </div>
           </div>
 
           {report.violations.length > 0 && (
             <div className="space-y-2 mt-3">
-              <div className="text-xs font-semibold text-slate-300">Flagged Constraint Violations:</div>
+              <div className="text-xs font-semibold text-[#A6B5AB]">Flagged Constraint Violations:</div>
               {report.violations.map((v, idx) => (
                 <div
                   key={idx}
-                  className={`p-3 rounded-xl border text-xs flex items-start gap-2.5 ${
+                  className={`p-3 rounded border text-xs flex items-start gap-2.5 ${
                     v.severity === 'error'
-                      ? 'bg-rose-950/20 border-rose-500/30 text-rose-300'
-                      : 'bg-amber-950/20 border-amber-500/30 text-amber-300'
+                      ? 'bg-rose-950/30 border-rose-800/40 text-rose-300'
+                      : 'bg-amber-950/30 border-amber-800/40 text-amber-300'
                   }`}
                 >
                   <AlertTriangle className="w-4 h-4 shrink-0 mt-0.5" />
@@ -268,21 +265,20 @@ export const ExportView: React.FC<ExportViewProps> = ({
         </div>
       )}
 
-      {/* Export Action Card */}
-      <div className="p-6 rounded-2xl bg-slate-900 border border-slate-800 space-y-4">
-        <h3 className="text-sm font-semibold text-white flex items-center gap-2">
-          <Download className="w-4 h-4 text-indigo-400" />
+      <div className="p-6 rounded-lg bg-[#14221B] border border-[#2A3D32] space-y-4">
+        <h3 className="text-sm font-semibold text-[#F1F5F2] flex items-center gap-2">
+          <Download className="w-4 h-4 text-[#22C55E]" />
           <span>Export Camera-Ready Files</span>
         </h3>
-        <p className="text-xs text-slate-400">
-          Rendered deterministically through Jinja2 LaTeX templates and compiled using tectonic / pandoc.
+        <p className="text-xs text-[#A6B5AB]">
+          Rendered deterministically through Jinja2 LaTeX templates and compiled using pdflatex.
         </p>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
           <button
             onClick={() => handleExport('pdf')}
             disabled={loadingExport || !draft}
-            className="p-3.5 rounded-xl font-semibold text-xs text-white bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 shadow-md flex items-center justify-center gap-2 disabled:opacity-50 transition-all"
+            className="p-3.5 rounded font-semibold text-xs text-[#0D1713] bg-[#22C55E] hover:bg-[#16a34a] flex items-center justify-center gap-2 disabled:opacity-50 transition-all"
           >
             <Download className="w-4 h-4" />
             <span>Download PDF</span>
@@ -291,27 +287,27 @@ export const ExportView: React.FC<ExportViewProps> = ({
           <button
             onClick={() => handleExport('docx')}
             disabled={loadingExport || !draft}
-            className="p-3.5 rounded-xl font-semibold text-xs text-slate-200 bg-slate-950 hover:bg-slate-800 border border-slate-800 flex items-center justify-center gap-2 disabled:opacity-50 transition-all"
+            className="p-3.5 rounded font-semibold text-xs text-[#F1F5F2] bg-[#0D1713] hover:bg-[#1B2D24] border border-[#2A3D32] flex items-center justify-center gap-2 disabled:opacity-50 transition-all"
           >
-            <FileText className="w-4 h-4 text-cyan-400" />
+            <FileText className="w-4 h-4 text-[#86EFAC]" />
             <span>Download DOCX</span>
           </button>
 
           <button
             onClick={handleDownloadLatex}
             disabled={!draft}
-            className="p-3.5 rounded-xl font-semibold text-xs text-slate-200 bg-slate-950 hover:bg-slate-800 border border-slate-800 flex items-center justify-center gap-2 disabled:opacity-50 transition-all"
+            className="p-3.5 rounded font-semibold text-xs text-[#F1F5F2] bg-[#0D1713] hover:bg-[#1B2D24] border border-[#2A3D32] flex items-center justify-center gap-2 disabled:opacity-50 transition-all"
           >
-            <FileCode className="w-4 h-4 text-emerald-400" />
+            <FileCode className="w-4 h-4 text-[#22C55E]" />
             <span>Export LaTeX (.tex)</span>
           </button>
 
           <button
             onClick={handleDownloadBib}
             disabled={!draft}
-            className="p-3.5 rounded-xl font-semibold text-xs text-slate-200 bg-slate-950 hover:bg-slate-800 border border-slate-800 flex items-center justify-center gap-2 disabled:opacity-50 transition-all"
+            className="p-3.5 rounded font-semibold text-xs text-[#F1F5F2] bg-[#0D1713] hover:bg-[#1B2D24] border border-[#2A3D32] flex items-center justify-center gap-2 disabled:opacity-50 transition-all"
           >
-            <FileText className="w-4 h-4 text-amber-400" />
+            <FileText className="w-4 h-4 text-[#86EFAC]" />
             <span>Export BibTeX (.bib)</span>
           </button>
         </div>

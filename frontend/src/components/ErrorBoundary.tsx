@@ -41,26 +41,26 @@ export class ErrorBoundary extends Component<Props, State> {
   public render() {
     if (this.state.hasError) {
       return (
-        <div className="min-h-screen bg-[#0f1f3d] flex items-center justify-center p-6 font-sans text-slate-200">
-          <div className="bg-[#162a52] border border-[#203a6b] rounded-2xl p-8 max-w-lg w-full shadow-2xl text-center space-y-5">
-            <div className="w-14 h-14 bg-rose-500/20 text-rose-400 border border-rose-500/40 rounded-xl flex items-center justify-center mx-auto">
+        <div className="min-h-screen bg-[#0D1713] flex items-center justify-center p-6 font-sans text-[#F1F5F2]">
+          <div className="bg-[#14221B] border border-[#2A3D32] rounded-lg p-8 max-w-lg w-full shadow-2xl text-center space-y-5">
+            <div className="w-14 h-14 bg-rose-950/60 text-rose-400 border border-rose-800/50 rounded-lg flex items-center justify-center mx-auto">
               <AlertTriangle className="w-7 h-7" />
             </div>
 
             <div>
-              <div className="text-[10px] font-mono tracking-widest text-[#3b82f6] uppercase font-bold mb-1">
+              <div className="text-[10px] font-mono tracking-widest text-[#22C55E] uppercase font-bold mb-1">
                 ScholarForge Recovery Console
               </div>
-              <h2 className="text-xl font-bold font-serif text-white">
+              <h2 className="text-xl font-display font-semibold text-[#F1F5F2]">
                 Something went wrong in the workspace
               </h2>
-              <p className="text-xs text-slate-400 mt-2 leading-relaxed">
+              <p className="text-xs text-[#A6B5AB] mt-2 leading-relaxed">
                 A UI rendering error occurred. You can reload the page or reset the active session.
               </p>
             </div>
 
             {this.state.error && (
-              <div className="bg-[#0f1f3d] text-rose-300 font-mono text-[11px] p-3 rounded-lg text-left overflow-x-auto border border-rose-900/50 max-h-32">
+              <div className="bg-[#0D1713] text-rose-300 font-mono text-[11px] p-3 rounded text-left overflow-x-auto border border-rose-900/50 max-h-32">
                 {this.state.error.toString()}
               </div>
             )}
@@ -68,14 +68,14 @@ export class ErrorBoundary extends Component<Props, State> {
             <div className="flex items-center gap-3 justify-center pt-2">
               <button
                 onClick={this.handleReset}
-                className="px-4 py-2 bg-[#2563eb] hover:bg-[#1d4ed8] text-white text-xs font-semibold rounded-lg shadow-sm transition-colors flex items-center gap-1.5"
+                className="px-4 py-2 bg-[#22C55E] hover:bg-[#16a34a] text-[#0D1713] text-xs font-semibold rounded transition-colors flex items-center gap-1.5"
               >
                 <RotateCcw className="w-3.5 h-3.5" />
                 <span>Reload Page</span>
               </button>
               <button
                 onClick={this.handleClearAndReset}
-                className="px-4 py-2 bg-[#1e3a6a] hover:bg-[#254680] text-slate-200 text-xs font-medium rounded-lg transition-colors flex items-center gap-1.5"
+                className="px-4 py-2 bg-[#1B2D24] hover:bg-[#14532D] border border-[#2A3D32] text-[#F1F5F2] text-xs font-medium rounded transition-colors flex items-center gap-1.5"
               >
                 <Home className="w-3.5 h-3.5" />
                 <span>Back to Home</span>

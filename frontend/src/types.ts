@@ -67,13 +67,46 @@ export interface PaperDraftSection {
   cited_keys: string[]
 }
 
+export interface CitationVerificationResult {
+  citation_key: string
+  verified: boolean
+  s2_paper_id?: string | null
+  title?: string | null
+  year?: number | null
+  url?: string | null
+  bibtex_entry?: string | null
+  status_message: string
+}
+
+export interface SentenceOverlapMatch {
+  draft_sentence: string
+  matched_paper_title?: string
+  matched_abstract_title?: string
+  matched_paper_id?: string
+  source_sentence?: string
+  matched_sentence?: string
+  similarity_score: number
+}
+
+export interface SimilarityReport {
+  mean_sentence_overlap?: number
+  max_sentence_overlap: number
+  high_similarity_matches: SentenceOverlapMatch[]
+  total_sentences_checked: number
+  is_flagged: boolean
+}
+
 export interface PaperDraft {
   title: string
-  venue: string
+  venue?: string
   abstract: string
   sections: PaperDraftSection[]
-  bibtex_entries: string[]
+  bibtex_content?: string
+  bibtex_entries?: string[]
+  citation_verifications?: CitationVerificationResult[]
+  similarity_report?: SimilarityReport | null
   total_word_count: number
+  target_pages?: number
 }
 
 export interface ReviewCritique {
@@ -90,21 +123,6 @@ export interface ReviewCritique {
   }[]
   overall_assessment: string
   disclaimer: string
-}
-
-export interface SentenceOverlapMatch {
-  draft_sentence: string
-  matched_abstract_title: string
-  matched_sentence: string
-  similarity_score: number
-}
-
-export interface SimilarityReport {
-  mean_sentence_overlap: number
-  max_sentence_overlap: number
-  high_similarity_matches: SentenceOverlapMatch[]
-  total_sentences_checked: number
-  is_flagged: boolean
 }
 
 export interface FormatConstraintViolation {

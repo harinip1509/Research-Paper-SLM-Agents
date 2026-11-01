@@ -66,7 +66,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
 
       const updated = await apiSaveSettingsKeys(payload)
       setInfo(updated)
-      setSuccess('Settings updated successfully! Keys persisted to .env.')
+      setSuccess('Settings updated and persisted to .env.')
       setGroqKey('')
       setS2Key('')
     } catch (err: any) {
@@ -77,84 +77,91 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
   }
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-xs font-sans">
-      <div className="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-2xl w-full overflow-hidden flex flex-col max-h-[90vh]">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-[#261C16]/45 backdrop-blur-xs font-sans">
+      <div className="bg-[#FAF7F2] rounded-3xl border border-[#E6DDD0] shadow-[0_24px_60px_rgba(38,28,22,0.22)] max-w-2xl w-full overflow-hidden flex flex-col max-h-[90vh] text-[#261C16]">
         {/* Modal Header */}
-        <div className="px-6 py-5 bg-[#0f1f3d] text-white flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-lg bg-[#2563eb] flex items-center justify-center text-white shadow-sm">
-              <Key className="w-5 h-5" />
+        <div className="px-6 py-5 bg-[#F3ECE2] border-b border-[#E6DDD0] flex items-center justify-between">
+          <div className="flex items-center gap-3.5">
+            <div className="w-10 h-10 rounded-full bg-[#3D281D] text-[#FAF7F2] flex items-center justify-center">
+              <Key className="w-4 h-4" />
             </div>
             <div>
-              <h2 className="text-lg font-bold font-serif tracking-tight">API Keys & Engine Settings</h2>
-              <p className="text-xs text-slate-300">
-                Configure LLM generation, Semantic Scholar literature discovery, and database status
+              <h2 className="text-2xl font-display font-semibold tracking-tight text-[#261C16]">
+                API Keys &amp; Studio Configuration
+              </h2>
+              <p className="text-xs text-[#6E6055]">
+                Configure LLM synthesis, Semantic Scholar discovery, and local SQLite persistence
               </p>
             </div>
           </div>
           <button
             onClick={onClose}
-            className="text-slate-400 hover:text-white transition-colors p-1.5 rounded-lg hover:bg-white/10"
+            className="text-[#8C7D70] hover:text-[#261C16] transition-colors p-2 rounded-full hover:bg-[#EADFD2]"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         </div>
 
         {/* Modal Body */}
-        <div className="p-6 overflow-y-auto space-y-6 flex-1">
+        <div className="p-6 overflow-y-auto space-y-5 flex-1">
           {error && (
-            <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-lg text-xs text-rose-700 flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 shrink-0 text-rose-500" />
+            <div className="p-3.5 bg-rose-50 border border-rose-200 rounded-2xl text-xs text-rose-800 flex items-center gap-2">
+              <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
               <span>{error}</span>
             </div>
           )}
 
           {success && (
-            <div className="p-3.5 bg-emerald-50 border border-emerald-200 rounded-lg text-xs text-emerald-700 flex items-center gap-2">
-              <CheckCircle2 className="w-4 h-4 shrink-0 text-emerald-600" />
+            <div className="p-3.5 bg-[#EFE6DA] border border-[#C8B29B] rounded-2xl text-xs text-[#3D281D] font-medium flex items-center gap-2">
+              <CheckCircle2 className="w-4 h-4 shrink-0 text-[#3D281D]" />
               <span>{success}</span>
             </div>
           )}
 
           {loading ? (
-            <div className="py-12 flex flex-col items-center justify-center text-slate-400 text-xs">
-              <div className="w-6 h-6 border-2 border-[#2563eb] border-t-transparent rounded-full animate-spin mb-2" />
-              Loading system configurations...
+            <div className="py-12 flex flex-col items-center justify-center text-[#8C7D70] text-xs">
+              <div className="w-6 h-6 border-2 border-[#3D281D] border-t-transparent rounded-full animate-spin mb-2" />
+              Loading studio configuration...
             </div>
           ) : (
-            <form id="settings-form" onSubmit={handleSave} className="space-y-6">
+            <form id="settings-form" onSubmit={handleSave} className="space-y-5">
               {/* Groq API Key Section */}
-              <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/60 space-y-3">
+              <div className="p-5 rounded-2xl bg-white border border-[#E6DDD0] space-y-3 shadow-2xs">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Cpu className="w-4 h-4 text-[#2563eb]" />
-                    <span className="text-xs font-bold font-serif text-slate-900">
-                      Groq API Key (Llama 3.3 70B Generation)
+                    <Cpu className="w-4 h-4 text-[#8C6B4F]" />
+                    <span className="font-display text-lg font-semibold text-[#261C16]">
+                      Groq API Key (Llama 3.3 70B Synthesis)
                     </span>
                   </div>
                   {info?.groq_api_key_configured ? (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-100 text-emerald-800">
+                    <span className="inline-flex items-center gap-1 px-3 py-0.5 rounded-full text-[11px] font-semibold bg-[#EADFD2] text-[#3D281D]">
                       <CheckCircle2 className="w-3 h-3" /> Live Groq Active
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-amber-100 text-amber-800">
-                      Offline / Deterministic Fallback
+                    <span className="inline-flex items-center gap-1 px-3 py-0.5 rounded-full text-[11px] font-medium bg-[#F3ECE2] text-[#6E6055] border border-[#E6DDD0]">
+                      Grounded Local Engine Active
                     </span>
                   )}
                 </div>
 
-                <p className="text-[11px] text-slate-500 leading-relaxed">
-                  Powers high-speed section-by-section academic paper writing, rubric critiques, and
-                  constraint-based word limit rewrites.
+                <p className="text-xs text-[#6E6055] leading-relaxed">
+                  Powers section-by-section academic manuscript drafting with automatic failover to
+                  the built-in topic-grounded synthesis engine.
                 </p>
 
-                <div className="text-[11px] font-mono text-slate-600 bg-white px-3 py-1.5 rounded-md border border-slate-200 flex items-center justify-between">
-                  <span>Current: <strong>{info?.groq_api_key_masked || 'Not Configured'}</strong></span>
+                <div className="text-xs text-[#6E6055] bg-[#FAF7F2] px-3.5 py-2 rounded-xl border border-[#E6DDD0] flex items-center justify-between">
+                  <span className="font-mono text-[11px]">
+                    Current:{' '}
+                    <strong className="text-[#261C16]">
+                      {info?.groq_api_key_masked || 'Not Configured'}
+                    </strong>
+                  </span>
                   <a
                     href="https://console.groq.com/keys"
                     target="_blank"
                     rel="noreferrer"
-                    className="text-[#2563eb] hover:underline flex items-center gap-1 text-[11px] font-sans"
+                    className="text-[#8C6B4F] hover:text-[#3D281D] hover:underline flex items-center gap-1 text-xs font-medium"
                   >
                     <span>Get Key</span>
                     <ExternalLink className="w-3 h-3" />
@@ -162,7 +169,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-medium text-slate-700 mb-1">
+                  <label className="block text-xs font-medium text-[#4A3728] mb-1">
                     Update Groq API Key
                   </label>
                   <div className="relative">
@@ -171,12 +178,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                       placeholder="Paste new Groq key (e.g. gsk_...)"
                       value={groqKey}
                       onChange={(e) => setGroqKey(e.target.value)}
-                      className="w-full text-xs px-3 py-2 pr-10 border border-slate-300 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] font-mono"
+                      className="w-full text-xs px-3.5 py-2.5 pr-10 bg-[#FAF7F2] border border-[#E6DDD0] rounded-xl text-[#261C16] placeholder-[#8C7D70] focus:outline-none focus:border-[#8C6B4F] font-mono"
                     />
                     <button
                       type="button"
                       onClick={() => setShowGroq(!showGroq)}
-                      className="absolute right-2.5 top-2.5 text-slate-400 hover:text-slate-600"
+                      className="absolute right-3 top-2.5 text-[#8C7D70] hover:text-[#261C16]"
                     >
                       {showGroq ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
@@ -185,37 +192,42 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
               </div>
 
               {/* Semantic Scholar API Key Section */}
-              <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/60 space-y-3">
+              <div className="p-5 rounded-2xl bg-white border border-[#E6DDD0] space-y-3 shadow-2xs">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Server className="w-4 h-4 text-[#2563eb]" />
-                    <span className="text-xs font-bold font-serif text-slate-900">
-                      Semantic Scholar API Key (Graph & Citations)
+                    <Server className="w-4 h-4 text-[#8C6B4F]" />
+                    <span className="font-display text-lg font-semibold text-[#261C16]">
+                      Semantic Scholar API Key (Literature &amp; Citations)
                     </span>
                   </div>
                   {info?.s2_api_key_configured ? (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-100 text-emerald-800">
+                    <span className="inline-flex items-center gap-1 px-3 py-0.5 rounded-full text-[11px] font-semibold bg-[#EADFD2] text-[#3D281D]">
                       <CheckCircle2 className="w-3 h-3" /> S2 Partner Active
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-medium bg-slate-100 text-slate-700">
-                      Public Tier (Rate-Limited)
+                    <span className="inline-flex items-center gap-1 px-3 py-0.5 rounded-full text-[11px] font-medium bg-[#F3ECE2] text-[#6E6055] border border-[#E6DDD0]">
+                      Public Graph Tier Active
                     </span>
                   )}
                 </div>
 
-                <p className="text-[11px] text-slate-500 leading-relaxed">
-                  Used by Topic Uniqueness (Agent 1) and Similarity Agent (Agent 6) to fetch real metadata,
-                  recommendations, and verified BibTeX citations without fabrications.
+                <p className="text-xs text-[#6E6055] leading-relaxed">
+                  Used by the Academic Search and Citation Verification agents to fetch peer-reviewed
+                  metadata, recommendations, and verified BibTeX records.
                 </p>
 
-                <div className="text-[11px] font-mono text-slate-600 bg-white px-3 py-1.5 rounded-md border border-slate-200 flex items-center justify-between">
-                  <span>Current: <strong>{info?.s2_api_key_masked || 'Not Configured'}</strong></span>
+                <div className="text-xs text-[#6E6055] bg-[#FAF7F2] px-3.5 py-2 rounded-xl border border-[#E6DDD0] flex items-center justify-between">
+                  <span className="font-mono text-[11px]">
+                    Current:{' '}
+                    <strong className="text-[#261C16]">
+                      {info?.s2_api_key_masked || 'Public Access'}
+                    </strong>
+                  </span>
                   <a
                     href="https://www.semanticscholar.org/product/api"
                     target="_blank"
                     rel="noreferrer"
-                    className="text-[#2563eb] hover:underline flex items-center gap-1 text-[11px] font-sans"
+                    className="text-[#8C6B4F] hover:text-[#3D281D] hover:underline flex items-center gap-1 text-xs font-medium"
                   >
                     <span>Request Key</span>
                     <ExternalLink className="w-3 h-3" />
@@ -223,7 +235,7 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                 </div>
 
                 <div>
-                  <label className="block text-[11px] font-medium text-slate-700 mb-1">
+                  <label className="block text-xs font-medium text-[#4A3728] mb-1">
                     Update Semantic Scholar Key
                   </label>
                   <div className="relative">
@@ -232,12 +244,12 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
                       placeholder="Paste S2 API key or leave blank for public access"
                       value={s2Key}
                       onChange={(e) => setS2Key(e.target.value)}
-                      className="w-full text-xs px-3 py-2 pr-10 border border-slate-300 rounded-lg focus:outline-hidden focus:ring-2 focus:ring-[#2563eb]/20 focus:border-[#2563eb] font-mono"
+                      className="w-full text-xs px-3.5 py-2.5 pr-10 bg-[#FAF7F2] border border-[#E6DDD0] rounded-xl text-[#261C16] placeholder-[#8C7D70] focus:outline-none focus:border-[#8C6B4F] font-mono"
                     />
                     <button
                       type="button"
                       onClick={() => setShowS2(!showS2)}
-                      className="absolute right-2.5 top-2.5 text-slate-400 hover:text-slate-600"
+                      className="absolute right-3 top-2.5 text-[#8C7D70] hover:text-[#261C16]"
                     >
                       {showS2 ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
@@ -246,39 +258,36 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
               </div>
 
               {/* Local SQLite Database Connection Section */}
-              <div className="p-4 rounded-xl border border-slate-200 bg-slate-50/60 space-y-3">
+              <div className="p-5 rounded-2xl bg-white border border-[#E6DDD0] space-y-3 shadow-2xs">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <Database className="w-4 h-4 text-[#2563eb]" />
-                    <span className="text-xs font-bold font-serif text-slate-900">
-                      Local SQLite Database
+                    <Database className="w-4 h-4 text-[#8C6B4F]" />
+                    <span className="font-display text-lg font-semibold text-[#261C16]">
+                      Local SQLite Archive
                     </span>
                   </div>
                   {info?.db_connected ? (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-100 text-emerald-800">
-                      <CheckCircle2 className="w-3 h-3" /> Connected & Persistent
+                    <span className="inline-flex items-center gap-1 px-3 py-0.5 rounded-full text-[11px] font-semibold bg-[#EADFD2] text-[#3D281D]">
+                      <CheckCircle2 className="w-3 h-3" /> Connected &amp; Persistent
                     </span>
                   ) : (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-rose-100 text-rose-800">
+                    <span className="inline-flex items-center gap-1 px-3 py-0.5 rounded-full text-[11px] font-semibold bg-rose-100 text-rose-800">
                       Disconnected
                     </span>
                   )}
                 </div>
 
-                <p className="text-[11px] text-slate-500 leading-relaxed">
-                  Your researcher accounts, sessions, and paper drafts are stored in the local SQLite database
-                  file on your machine. Each registered account has an isolated workspace.
+                <p className="text-xs text-[#6E6055] leading-relaxed">
+                  Your scholar accounts, sessions, and manuscript drafts are persisted locally in
+                  your SQLite database file.
                 </p>
 
-                <div className="bg-white p-2.5 rounded-lg border border-slate-200 space-y-1.5 font-mono text-[11px]">
-                  <div className="text-slate-500 text-[10px] uppercase font-bold tracking-wider">
-                    Database File Path:
+                <div className="bg-[#FAF7F2] p-3.5 rounded-xl border border-[#E6DDD0] space-y-1.5 text-xs">
+                  <div className="text-[#8C7D70] text-[10px] uppercase font-semibold tracking-wider">
+                    Database File Path
                   </div>
-                  <div className="text-slate-800 break-all bg-slate-100 px-2 py-1 rounded">
+                  <div className="font-mono text-[11px] text-[#3D281D] break-all bg-white px-2.5 py-1.5 rounded-lg border border-[#E6DDD0]">
                     {info?.db_path || 'scholarforge.db'}
-                  </div>
-                  <div className="text-[10px] text-slate-500 pt-1">
-                    Mode: <code>WAL (Write-Ahead Logging)</code> • Multi-user isolated tables: <code>users</code>, <code>sessions</code>, <code>projects</code>, <code>uniqueness_runs</code>.
                   </div>
                 </div>
               </div>
@@ -287,15 +296,15 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
         </div>
 
         {/* Modal Footer */}
-        <div className="px-6 py-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
-          <span className="text-[11px] text-slate-400">
-            Keys are stored in your workspace <code>.env</code> file.
+        <div className="px-6 py-4 bg-[#F3ECE2] border-t border-[#E6DDD0] flex items-center justify-between">
+          <span className="text-xs text-[#6E6055]">
+            Keys are saved to your local <code className="text-[#261C16] font-mono">.env</code> file.
           </span>
           <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={onClose}
-              className="px-3.5 py-2 text-xs font-medium text-slate-600 hover:text-slate-900 transition-colors"
+              className="px-4 py-2 text-xs font-medium text-[#6E6055] hover:text-[#261C16] transition-colors"
             >
               Close
             </button>
@@ -303,10 +312,10 @@ export const SettingsModal: React.FC<SettingsModalProps> = ({ isOpen, onClose })
               form="settings-form"
               type="submit"
               disabled={saving || (!groqKey.trim() && !s2Key.trim())}
-              className="px-4 py-2 bg-[#2563eb] hover:bg-[#1d4ed8] disabled:bg-slate-300 text-white text-xs font-semibold rounded-lg shadow-sm transition-colors flex items-center gap-1.5"
+              className="px-5 py-2.5 bg-[#3D281D] hover:bg-[#2B1B12] disabled:opacity-40 text-[#FAF7F2] text-xs font-semibold rounded-full transition-colors flex items-center gap-1.5"
             >
               <Save className="w-3.5 h-3.5" />
-              <span>{saving ? 'Saving...' : 'Save Keys'}</span>
+              <span>{saving ? 'Saving...' : 'Save Configuration'}</span>
             </button>
           </div>
         </div>

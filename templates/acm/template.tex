@@ -2,6 +2,7 @@
 
 \usepackage{booktabs}
 \usepackage{amsmath}
+\usepackage{algorithmic}
 \usepackage{microtype}
 
 \begin{document}
@@ -42,7 +43,15 @@
 {{ ai_disclosure }}
 {% endif %}
 
+{% if bib_items %}
+\begin{thebibliography}{99}
+{% for item in bib_items %}
+\bibitem{ {{- item.key -}} } {{ item.formatted }}
+{% endfor %}
+\end{thebibliography}
+{% else %}
 \bibliographystyle{ACM-Reference-Format}
 \bibliography{references}
+{% endif %}
 
 \end{document}

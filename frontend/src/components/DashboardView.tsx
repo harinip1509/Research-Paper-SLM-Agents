@@ -1,5 +1,5 @@
 import React from 'react'
-import { ArrowRight, BookOpen, Sparkles, FolderPlus, Clock, Trash2, Key } from 'lucide-react'
+import { ArrowUpRight, Sparkles, FolderPlus, Clock, Trash2, Key } from 'lucide-react'
 import { NavView } from './Sidebar'
 import { ProjectSummary } from '../types'
 
@@ -55,162 +55,202 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
   onOpenSettings,
 }) => {
   const pipelineSteps = [
-    { num: 1, name: 'Research Topic', desc: 'Define your research question and scope', target: 'project' as NavView },
-    { num: 2, name: 'Academic Search', desc: 'Semantic Scholar literature search', target: 'agent-status' as NavView },
-    { num: 3, name: 'Literature Analysis', desc: 'Extract problem, method, claims', target: 'agent-status' as NavView },
-    { num: 4, name: 'Topic Uniqueness', desc: 'BGE-small vector novelty score', target: 'final-check' as NavView },
-    { num: 5, name: 'Paper Writing', desc: 'Two-stage grounded drafting', target: 'workspace' as NavView },
-    { num: 6, name: 'Similarity Check', desc: 'Sentence-level overlap audit', target: 'final-check' as NavView },
-    { num: 7, name: 'Final Paper', desc: 'Conference PDF & DOCX export', target: 'final-report' as NavView },
+    { num: '4.1', name: 'Topic Uniqueness Agent', desc: 'Identifies existing work & novelty', target: 'project' as NavView },
+    { num: '4.2', name: 'Literature Agent', desc: 'Extracts structured aspect summaries', target: 'agent-status' as NavView },
+    { num: '4.3', name: 'Planning Agent', desc: 'Decomposes goals into research plan', target: 'agent-status' as NavView },
+    { num: '4.4', name: 'Writing Agent', desc: 'Produces grounded academic content', target: 'workspace' as NavView },
+    { num: '4.5', name: 'Review Agent', desc: 'Automated quality control & rubric', target: 'final-check' as NavView },
+    { num: '4.6', name: 'Similarity and Citation Agent', desc: 'SBERT cosine overlap & citations', target: 'final-check' as NavView },
+    { num: '4.7', name: 'Formatting Agent', desc: 'Journal & conference typesetting', target: 'final-report' as NavView },
   ]
 
   return (
     <div className="space-y-8 max-w-6xl mx-auto font-sans">
-      {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-start justify-between gap-4">
-        <div>
-          <div className="text-[11px] font-mono tracking-widest text-[#2563eb] font-semibold uppercase mb-1.5">
-            ScholarForge — Dashboard
+      {/* Warm Espresso Editorial Banner */}
+      <div className="bg-espresso-hero rounded-[28px] p-6 sm:p-9 text-[#FAF7F2] shadow-sm">
+        <div className="rounded-2xl border border-white/20 bg-white/[0.03] p-6 sm:p-8 flex flex-col lg:flex-row lg:items-center justify-between gap-6">
+          <div className="space-y-2.5 max-w-2xl">
+            <div className="text-[11px] tracking-[0.18em] uppercase text-[#EADFD2] font-medium">
+              Editorial Research Studio
+            </div>
+            <h1 className="font-display text-3xl sm:text-5xl font-normal tracking-tight text-[#FDFBF7]">
+              Scholarly Synthesis &amp; Typesetting
+            </h1>
+            <p className="text-xs sm:text-sm text-[#E6DDD0]/90 leading-relaxed">
+              Coordinate literature discovery, empirical novelty calibration, grounded LaTeX
+              drafting, and exact-page conference compilation from a single calm workspace.
+            </p>
           </div>
-          <h1 className="text-3xl sm:text-4xl font-bold font-serif text-slate-900 tracking-tight">
-            Research Workflow
-          </h1>
-          <p className="text-sm text-slate-500 mt-2 max-w-3xl leading-relaxed">
-            A seven-stage pipeline where specialized AI agents work together to produce an original,
-            literature-supported conference paper draft.
-          </p>
-        </div>
-        {onOpenSettings && (
-          <button
-            onClick={onOpenSettings}
-            className="inline-flex items-center gap-2 px-3.5 py-2 rounded-lg border border-slate-200 bg-white hover:bg-slate-50 text-slate-700 text-xs font-semibold shadow-2xs transition-all shrink-0 hover:border-slate-300"
-          >
-            <Key className="w-3.5 h-3.5 text-amber-500" />
-            <span>API Keys & DB</span>
-          </button>
-        )}
-      </div>
 
-      {/* Pipeline Overview */}
-      <div className="bg-white rounded-xl border border-[#e2e8f0] p-6 shadow-xs">
-        <h2 className="text-base font-bold font-serif text-slate-900 mb-6">
-          Pipeline Overview
-        </h2>
-
-        {/* Step Circles Row */}
-        <div className="relative flex items-center justify-between">
-          {/* Connector Line */}
-          <div className="absolute top-5 left-6 right-6 h-0.5 bg-slate-200 -z-0" />
-
-          {pipelineSteps.map((step) => {
-            const isActive = step.num === 1
-            return (
-              <div
-                key={step.num}
-                onClick={() => onNavigate(step.target)}
-                className="relative z-10 flex flex-col items-center cursor-pointer group text-center max-w-[110px]"
+          <div className="flex flex-wrap items-center gap-3 shrink-0">
+            <div className="inline-flex items-center gap-1.5">
+              <button
+                onClick={onNewProject}
+                className="px-6 py-3 rounded-full bg-white hover:bg-[#FAF7F2] text-[#261C16] text-xs font-semibold transition-all shadow-xs"
               >
-                <div
-                  className={`w-10 h-10 rounded-full flex items-center justify-center font-mono text-sm font-semibold transition-all ${
-                    isActive
-                      ? 'border-2 border-[#2563eb] bg-white text-[#2563eb] shadow-sm'
-                      : 'border-2 border-slate-200 bg-white text-slate-400 group-hover:border-slate-400 group-hover:text-slate-600'
-                  }`}
-                >
-                  {step.num}
-                </div>
+                Start New Manuscript
+              </button>
+              <button
+                onClick={onNewProject}
+                aria-label="Start New Manuscript"
+                className="w-10 h-10 rounded-full bg-white/90 hover:bg-white text-[#261C16] flex items-center justify-center transition-all"
+              >
+                <ArrowUpRight className="w-4 h-4" />
+              </button>
+            </div>
 
-                <div
-                  className={`text-xs font-semibold mt-2.5 leading-snug ${
-                    isActive ? 'text-[#2563eb]' : 'text-slate-700 group-hover:text-slate-900'
-                  }`}
-                >
-                  {step.name}
-                </div>
-
-                {step.desc && (
-                  <div className="text-[10px] text-slate-400 mt-0.5 leading-tight hidden lg:block">
-                    {step.desc}
-                  </div>
-                )}
-              </div>
-            )
-          })}
+            {onOpenSettings && (
+              <button
+                onClick={onOpenSettings}
+                className="px-4 py-3 rounded-full border border-white/30 hover:bg-white/10 text-[#FDFBF7] text-xs font-medium transition-colors inline-flex items-center gap-2"
+              >
+                <Key className="w-3.5 h-3.5 text-[#EADFD2]" />
+                <span>API Keys &amp; DB</span>
+              </button>
+            )}
+          </div>
         </div>
       </div>
 
-      {/* 4 Summary Stat Cards */}
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-        <div className="bg-white rounded-xl border border-[#e2e8f0] p-5">
-          <div className="text-[10px] font-mono tracking-wider text-slate-400 uppercase font-semibold">
-            Current Stage
+      {/* 4 Summary Stat Strip (Warm Linen Card) */}
+      <div className="rounded-3xl bg-[#F3ECE2] border border-[#E6DDD0] p-6 grid grid-cols-2 lg:grid-cols-4 divide-y sm:divide-y-0 sm:divide-x divide-[#DFD3C3] gap-4 sm:gap-0">
+        <div className="sm:pr-6">
+          <div className="text-[10px] tracking-[0.15em] text-[#8C7D70] uppercase font-semibold">
+            Active View
           </div>
-          <div className="text-lg font-bold font-serif text-slate-900 mt-2 truncate">
-            {currentStageName || 'Research Topic'}
-          </div>
-        </div>
-
-        <div className="bg-white rounded-xl border border-[#e2e8f0] p-5">
-          <div className="text-[10px] font-mono tracking-wider text-slate-400 uppercase font-semibold">
-            Papers Retrieved
-          </div>
-          <div className="text-xl font-bold font-serif text-slate-900 mt-2">
-            {papersCount > 0 ? papersCount : 0}
+          <div className="font-display text-2xl font-semibold text-[#261C16] mt-1 truncate">
+            {currentStageName || 'Studio Overview'}
           </div>
         </div>
 
-        <div className="bg-white rounded-xl border border-[#e2e8f0] p-5">
-          <div className="text-[10px] font-mono tracking-wider text-slate-400 uppercase font-semibold">
-            Originality Score
+        <div className="sm:px-6 pt-3 sm:pt-0">
+          <div className="text-[10px] tracking-[0.15em] text-[#8C7D70] uppercase font-semibold">
+            Literature Retrieved
           </div>
-          <div className="text-xl font-bold font-serif text-slate-900 mt-2">
+          <div className="font-display text-3xl font-semibold text-[#261C16] mt-1">
+            {papersCount > 0 ? `${papersCount} Papers` : '0 Papers'}
+          </div>
+        </div>
+
+        <div className="sm:px-6 pt-3 sm:pt-0">
+          <div className="text-[10px] tracking-[0.15em] text-[#8C7D70] uppercase font-semibold">
+            Originality Index
+          </div>
+          <div className="font-display text-3xl font-semibold text-[#8C6B4F] mt-1">
             {typeof uniquenessScore === 'number' && !isNaN(uniquenessScore)
               ? (uniquenessScore / 100).toFixed(3)
               : '—'}
           </div>
         </div>
 
-        <div className="bg-white rounded-xl border border-[#e2e8f0] p-5">
-          <div className="text-[10px] font-mono tracking-wider text-slate-400 uppercase font-semibold">
-            Citation Accuracy
+        <div className="sm:pl-6 pt-3 sm:pt-0">
+          <div className="text-[10px] tracking-[0.15em] text-[#8C7D70] uppercase font-semibold">
+            Citation Provenance
           </div>
-          <div className="text-xl font-bold font-serif text-slate-900 mt-2">
-            {citationCount > 0 ? '100%' : '—'}
+          <div className="font-display text-3xl font-semibold text-[#3D281D] mt-1">
+            {citationCount > 0 ? '100% Verified' : 'Standby'}
           </div>
         </div>
       </div>
 
-      {/* Quick-Start Research Templates */}
-      <div className="bg-white rounded-xl border border-[#e2e8f0] p-6 shadow-xs">
-        <div className="flex items-center justify-between mb-4">
+      {/* 7-Stage Editorial Pipeline Map */}
+      <div className="rounded-3xl bg-white border border-[#E6DDD0] p-6 sm:p-8 shadow-2xs space-y-5">
+        <div className="flex items-center justify-between">
           <div>
-            <h3 className="text-sm font-bold font-serif text-slate-900">
-              Quick-Start Research Presets
-            </h3>
-            <p className="text-xs text-slate-500 mt-0.5">
-              Click any template to auto-populate the project configuration and launch the agents.
-            </p>
+            <span className="text-[10px] tracking-[0.16em] uppercase text-[#8C6B4F] font-semibold block">
+              Methodological Architecture
+            </span>
+            <h2 className="font-display text-2xl font-semibold text-[#261C16]">
+              Seven-Stage Research Pipeline
+            </h2>
           </div>
-          <Sparkles className="w-4 h-4 text-[#2563eb]" />
+          <span className="text-xs text-[#8C7D70] hidden sm:inline">
+            Select any stage to inspect or configure
+          </span>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
+        <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-3">
+          {pipelineSteps.map((step, idx) => {
+            const isFirst = idx === 0
+            return (
+              <div
+                key={step.num}
+                onClick={() => onNavigate(step.target)}
+                className={`p-4 rounded-2xl border cursor-pointer transition-all group flex flex-col justify-between ${
+                  isFirst
+                    ? 'bg-[#3D281D] text-[#FAF7F2] border-[#3D281D]'
+                    : 'bg-[#FAF7F2] text-[#261C16] border-[#E6DDD0] hover:bg-[#F3ECE2] hover:border-[#C8B29B]'
+                }`}
+              >
+                <div className="flex items-center justify-between mb-3">
+                  <span
+                    className={`font-display text-sm font-semibold italic ${
+                      isFirst ? 'text-[#EADFD2]' : 'text-[#8C6B4F]'
+                    }`}
+                  >
+                    Agent {step.num}
+                  </span>
+                  <ArrowUpRight
+                    className={`w-3.5 h-3.5 transition-transform group-hover:translate-x-0.5 group-hover:-translate-y-0.5 ${
+                      isFirst ? 'text-[#EADFD2]' : 'text-[#8C7D70]'
+                    }`}
+                  />
+                </div>
+
+                <div>
+                  <div className="text-xs font-semibold leading-snug">{step.name}</div>
+                  <div
+                    className={`text-[11px] mt-1 leading-tight ${
+                      isFirst ? 'text-[#E6DDD0]/80' : 'text-[#6E6055]'
+                    }`}
+                  >
+                    {step.desc}
+                  </div>
+                </div>
+              </div>
+            )
+          })}
+        </div>
+      </div>
+
+      {/* Curated Research Presets (Warm Sand Container) */}
+      <div className="rounded-3xl bg-[#EFE6DA] border border-[#E2D6C5] p-6 sm:p-8 space-y-5">
+        <div className="flex items-center justify-between">
+          <div>
+            <span className="text-[10px] tracking-[0.16em] uppercase text-[#8C6B4F] font-semibold block">
+              Curated Exemplars
+            </span>
+            <h3 className="font-display text-2xl font-semibold text-[#261C16]">
+              Quick-Start Research Topics
+            </h3>
+          </div>
+          <div className="w-9 h-9 rounded-full bg-white border border-[#E6DDD0] flex items-center justify-center text-[#8C6B4F]">
+            <Sparkles className="w-4 h-4" />
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
           {TEMPLATES.map((tmpl, idx) => (
             <div
               key={idx}
               onClick={() => onApplyPreset(tmpl)}
-              className="p-3.5 rounded-lg border border-[#e2e8f0] hover:border-[#2563eb] hover:bg-blue-50/20 cursor-pointer transition-all group"
+              className="p-5 rounded-2xl bg-[#FAF7F2] border border-[#E6DDD0] hover:border-[#8C6B4F] hover:bg-white cursor-pointer transition-all group flex flex-col justify-between shadow-2xs"
             >
-              <div className="text-xs font-bold text-slate-900 group-hover:text-[#2563eb] line-clamp-1">
-                {tmpl.title}
+              <div>
+                <span className="inline-block px-2.5 py-0.5 rounded-full bg-[#EADFD2] text-[#3D281D] text-[10px] uppercase tracking-wider font-semibold mb-2.5">
+                  {tmpl.venue.toUpperCase()} Format
+                </span>
+                <h4 className="font-display text-xl font-semibold text-[#261C16] leading-snug group-hover:text-[#3D281D]">
+                  {tmpl.title}
+                </h4>
+                <p className="text-xs text-[#6E6055] mt-2 line-clamp-3 leading-relaxed">
+                  {tmpl.abstract}
+                </p>
               </div>
-              <p className="text-[11px] text-slate-500 mt-1 line-clamp-2 leading-relaxed">
-                {tmpl.abstract}
-              </p>
-              <div className="flex items-center justify-between mt-2.5 pt-2 border-t border-slate-100 text-[10px] font-mono text-slate-400">
-                <span className="uppercase font-semibold text-slate-600">{tmpl.venue}</span>
-                <span className="text-[#2563eb] group-hover:underline flex items-center gap-1">
-                  Use Preset &rarr;
+              <div className="flex items-center justify-between mt-4 pt-3 border-t border-[#E6DDD0] text-xs font-medium text-[#3D281D]">
+                <span>Load Topic &amp; Notes</span>
+                <span className="w-7 h-7 rounded-full bg-[#3D281D] text-[#FAF7F2] flex items-center justify-center group-hover:bg-[#2B1B12] transition-colors">
+                  <ArrowUpRight className="w-3.5 h-3.5" />
                 </span>
               </div>
             </div>
@@ -218,112 +258,132 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
         </div>
       </div>
 
-      {/* Bottom Section: Start Project & Recent Projects */}
+      {/* Bottom Section: New Manuscript & Saved Library */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        {/* Left Box: Start New Project */}
-        <div className="bg-white rounded-xl border border-[#e2e8f0] p-6 flex flex-col justify-between space-y-6">
-          <div>
-            <h3 className="text-lg font-bold font-serif text-slate-900">
-              Start a New Research Project
+        {/* Left Box: Compose Custom Manuscript */}
+        <div className="rounded-3xl bg-white border border-[#E6DDD0] p-6 sm:p-8 flex flex-col justify-between space-y-6 shadow-2xs">
+          <div className="space-y-3">
+            <span className="text-[10px] tracking-[0.16em] uppercase text-[#8C6B4F] font-semibold block">
+              Custom Investigation
+            </span>
+            <h3 className="font-display text-2xl sm:text-3xl font-semibold text-[#261C16]">
+              Compose a New Manuscript
             </h3>
-            <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-              Enter your custom research question and preliminary notes to begin the automated literature search and paper generation workflow.
+            <p className="text-xs text-[#6E6055] leading-relaxed">
+              Define your research question, preliminary experimental observations, target page
+              budget (1–30 pages), and conference formatting profile to begin.
             </p>
 
-            <button
-              onClick={onNewProject}
-              className="mt-4 px-5 py-2.5 rounded-lg text-xs font-semibold text-white bg-[#0f1f3d] hover:bg-[#162a52] transition-colors flex items-center gap-2 shadow-sm"
-            >
-              <FolderPlus className="w-3.5 h-3.5" />
-              <span>New Project</span>
-              <ArrowRight className="w-3.5 h-3.5 ml-1" />
-            </button>
+            <div className="pt-2 inline-flex items-center gap-1.5">
+              <button
+                onClick={onNewProject}
+                className="px-6 py-3 rounded-full text-xs font-semibold text-[#FAF7F2] bg-[#3D281D] hover:bg-[#2B1B12] transition-colors inline-flex items-center gap-2"
+              >
+                <FolderPlus className="w-3.5 h-3.5" />
+                <span>Configure New Project</span>
+              </button>
+              <button
+                onClick={onNewProject}
+                aria-label="Configure New Project"
+                className="w-10 h-10 rounded-full bg-[#EADFD2] hover:bg-[#DFD0BE] text-[#3D281D] flex items-center justify-center transition-colors"
+              >
+                <ArrowUpRight className="w-4 h-4" />
+              </button>
+            </div>
           </div>
 
-          {/* System Information Box */}
-          <div className="rounded-lg bg-[#f8fafc] border border-[#e2e8f0] p-4 text-[11px] font-mono">
-            <div className="text-[10px] tracking-wider text-slate-400 uppercase font-semibold mb-2.5">
-              Agent Architecture
+          {/* Engine Summary Box */}
+          <div className="rounded-2xl bg-[#FAF7F2] border border-[#E6DDD0] p-4 text-xs space-y-2">
+            <div className="text-[10px] tracking-[0.15em] text-[#8C7D70] uppercase font-semibold">
+              Studio Capabilities
             </div>
-            <div className="space-y-1.5 text-slate-600">
+            <div className="space-y-1.5 text-[#6E6055]">
               <div className="flex justify-between">
-                <span>Literature + Uniqueness</span>
-                <span className="text-slate-900 font-medium">BGE-small + S2 Graph API</span>
+                <span>Literature &amp; Novelty</span>
+                <span className="text-[#261C16] font-medium">Semantic Scholar + BGE-small</span>
               </div>
               <div className="flex justify-between">
-                <span>Similarity Audit</span>
-                <span className="text-slate-900 font-medium">Sentence Transformer + cosine</span>
+                <span>Grounded Synthesis</span>
+                <span className="text-[#261C16] font-medium">Llama 3.3 70B + Local Engine</span>
               </div>
               <div className="flex justify-between">
-                <span>Writing Agent</span>
-                <span className="text-slate-900 font-medium">Groq Llama 3.3 / Offline Grounded</span>
+                <span>Multi-Venue Compilation</span>
+                <span className="text-[#8C6B4F] font-medium">IEEE, ACL, ACM, LNCS &amp; arXiv</span>
               </div>
             </div>
           </div>
         </div>
 
-        {/* Right Box: Recent Projects */}
-        <div className="bg-white rounded-xl border border-[#e2e8f0] p-6 space-y-4">
+        {/* Right Box: Saved Manuscripts */}
+        <div className="rounded-3xl bg-white border border-[#E6DDD0] p-6 sm:p-8 space-y-4 shadow-2xs">
           <div className="flex items-center justify-between">
-            <h3 className="text-lg font-bold font-serif text-slate-900">
-              Recent Projects
-            </h3>
-            <span className="text-[10px] font-mono text-slate-400 uppercase font-semibold">
-              {Array.isArray(projects) ? projects.length : 0} saved
+            <div>
+              <span className="text-[10px] tracking-[0.16em] uppercase text-[#8C6B4F] font-semibold block">
+                Local Archive
+              </span>
+              <h3 className="font-display text-2xl sm:text-3xl font-semibold text-[#261C16]">
+                Saved Manuscripts
+              </h3>
+            </div>
+            <span className="text-xs text-[#4A3728] bg-[#F3ECE2] px-3 py-1 rounded-full border border-[#E6DDD0] font-medium">
+              {Array.isArray(projects) ? projects.length : 0} Saved
             </span>
           </div>
 
           {!Array.isArray(projects) || projects.length === 0 ? (
-            <div className="py-8 text-center border border-dashed border-slate-200 rounded-lg">
-              <Clock className="w-6 h-6 text-slate-300 mx-auto mb-2" />
-              <p className="text-xs text-slate-500 font-medium">No saved research projects yet.</p>
-              <p className="text-[11px] text-slate-400 mt-1 max-w-xs mx-auto">
-                Click "New Project" or apply a preset above to launch the autonomous agent pipeline.
+            <div className="py-10 text-center border border-dashed border-[#DFD3C3] rounded-2xl bg-[#FAF7F2]">
+              <Clock className="w-6 h-6 text-[#8C7D70] mx-auto mb-2" />
+              <p className="text-xs text-[#261C16] font-semibold">No saved manuscripts yet</p>
+              <p className="text-[11px] text-[#6E6055] mt-1 max-w-xs mx-auto">
+                Start a new project or select a curated topic above to generate your first
+                manuscript.
               </p>
             </div>
           ) : (
-            <div className="divide-y divide-slate-100 max-h-[300px] overflow-y-auto">
+            <div className="divide-y divide-[#E6DDD0] max-h-[300px] overflow-y-auto pr-1">
               {(Array.isArray(projects) ? projects : []).map((p) => (
                 <div key={p.id} className="py-3.5 first:pt-0 last:pb-0 group">
                   <div className="flex items-start justify-between gap-2">
                     <div
                       onClick={() => onSelectProject(p.id)}
-                      className="text-xs font-semibold text-slate-900 hover:text-[#2563eb] cursor-pointer line-clamp-1"
+                      className="text-sm font-display font-semibold text-[#261C16] hover:text-[#8C6B4F] cursor-pointer line-clamp-1 transition-colors"
                     >
-                      {p.title || 'Untitled Project'}
+                      {p.title || 'Untitled Manuscript'}
                     </div>
-                    <div className="text-[10px] font-mono text-slate-400 shrink-0">
+                    <div className="text-[11px] text-[#8C7D70] shrink-0">
                       {typeof p.updated_at === 'string' && p.updated_at
                         ? p.updated_at.split(' ')[0].split('T')[0]
-                        : 'Today'}
+                        : 'Recent'}
                     </div>
                   </div>
 
-                  <div className="flex items-center justify-between mt-1.5 text-[11px] font-mono">
-                    <div className="flex items-center gap-3">
-                      <span className="text-slate-500 uppercase">{p.venue || 'ieee'}</span>
+                  <div className="flex items-center justify-between mt-1.5 text-xs">
+                    <div className="flex items-center gap-2.5">
+                      <span className="px-2 py-0.5 rounded-full bg-[#F3ECE2] text-[#3D281D] text-[10px] uppercase font-semibold">
+                        {p.venue || 'ieee'}
+                      </span>
                       {typeof p.papers_count === 'number' && p.papers_count > 0 && (
-                        <span className="text-slate-500">{p.papers_count} papers</span>
+                        <span className="text-[#6E6055] text-[11px]">{p.papers_count} papers</span>
                       )}
                       {p.uniqueness_score != null && !isNaN(Number(p.uniqueness_score)) && (
-                        <span className="text-emerald-600 font-semibold">
-                          Orig: {(Number(p.uniqueness_score) / 100).toFixed(3)}
+                        <span className="text-[#8C6B4F] text-[11px] font-medium">
+                          Originality: {(Number(p.uniqueness_score) / 100).toFixed(3)}
                         </span>
                       )}
                     </div>
-                    <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <div className="flex items-center gap-2.5 opacity-80 group-hover:opacity-100 transition-opacity">
                       <button
                         onClick={() => onSelectProject(p.id)}
-                        className="text-[10px] text-[#2563eb] font-sans hover:underline"
+                        className="text-xs text-[#3D281D] font-semibold hover:underline"
                       >
                         Open
                       </button>
                       {onDeleteProject && (
                         <button
                           onClick={() => onDeleteProject(p.id)}
-                          className="text-slate-400 hover:text-rose-600"
+                          className="text-[#8C7D70] hover:text-rose-700"
                         >
-                          <Trash2 className="w-3 h-3" />
+                          <Trash2 className="w-3.5 h-3.5" />
                         </button>
                       )}
                     </div>

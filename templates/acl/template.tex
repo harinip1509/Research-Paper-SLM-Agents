@@ -1,12 +1,13 @@
 \documentclass[11pt,a4paper,twocolumn]{article}
 \usepackage[utf8]{inputenc}
-\usepackage[margin=2.5cm]{geometry}
+\usepackage[margin=2.0cm]{geometry}
 \usepackage{times}
 \usepackage{latexsym}
-\usepackage{amsmath,amssymb}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
 \usepackage{booktabs}
 \usepackage{url}
-\usepackage{natbib}
+\usepackage[numbers]{natbib}
 \usepackage{microtype}
 
 \title{ {{- title -}} }
@@ -47,7 +48,15 @@
 {{ ai_disclosure }}
 {% endif %}
 
+{% if bib_items %}
+\begin{thebibliography}{99}
+{% for item in bib_items %}
+\bibitem{ {{- item.key -}} } {{ item.formatted }}
+{% endfor %}
+\end{thebibliography}
+{% else %}
 \bibliographystyle{acl_natbib}
 \bibliography{references}
+{% endif %}
 
 \end{document}

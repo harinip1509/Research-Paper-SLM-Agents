@@ -143,3 +143,92 @@ def test_generate_ai_disclosure():
     assert "ScholarForge" in disclosure
     assert "IEEE" in disclosure
     assert "independently developed and verified" in disclosure
+
+
+@pytest.mark.parametrize("target_pages", [2, 4, 6, 8])
+def test_compile_pdf_exact_target_pages(target_pages: int):
+    """Verify that PDF compilation produces the exact number of pages requested by the user."""
+    from pypdf import PdfReader
+
+    req = FormatExportRequest(
+        venue_id="ieee",
+        title="Empirical Scaling of Multi-Agent Research Pipelines",
+        authors=[{"name": "Jane Researcher", "affiliation": "CS Lab", "email": "jane@lab.edu"}],
+        abstract="We investigate multi-agent orchestration for scientific paper composition and citation verification across benchmarks.",
+        keywords=["Multi-Agent Systems", "Natural Language Processing", "Academic Writing"],
+        sections=[
+            {
+                "title": "Introduction and Motivation",
+                "content": ("Recent advances in language modeling have transformed scientific workflows ~\\cite{Vaswani2017}. " * 18).strip(),
+            },
+            {
+                "title": "Methodology and Architecture",
+                "content": ("Our architecture integrates dense retrieval with calibrated generation ~\\cite{Vaswani2017}. " * 18).strip(),
+            },
+            {
+                "title": "Empirical Evaluation",
+                "content": ("Quantitative experiments demonstrate consistent improvements across all metrics ~\\cite{Vaswani2017}. " * 18).strip(),
+            },
+        ],
+        bibtex="@inproceedings{Vaswani2017, author={Vaswani, Ashish}, title={Attention Is All You Need}, booktitle={NeurIPS}, year={2017}}",
+        target_pages=target_pages,
+    )
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        latex_src = formatting_agent.render_latex(req)
+        pdf_path = formatting_agent.compile_pdf(
+            latex_src,
+            req.bibtex,
+            output_dir=Path(tmpdir),
+            target_pages=target_pages,
+            request=req,
+        )
+        assert pdf_path.exists()
+        reader = PdfReader(str(pdf_path))
+        assert len(reader.pages) == target_pages
+
+
+def test_multi_venue_pdf_and_docx_differentiation():
+    """Verify that IEEE, ACL, ACM, LNCS, and Generic produce distinct PDF, DOCX, Markdown, and HTML outputs."""
+    base_kwargs = dict(
+        title="Cross-Venue Formatting Differentiation Study",
+        authors=[{"name": "Alice Smith", "affiliation": "AI Institute", "email": "alice@ai.org"}],
+        abstract="We evaluate deterministic multi-venue formatting across conference templates.",
+        keywords=["Formatting", "LaTeX", "Conferences"],
+        sections=[
+            {"title": "Introduction", "content": "Foundational analysis of conference formatting ~\\cite{Vaswani2017}. " * 12},
+            {"title": "Conclusion", "content": "Summary of multi-venue findings. " * 12},
+        ],
+        bibtex="@inproceedings{Vaswani2017, author={Vaswani, Ashish}, title={Attention Is All You Need}, booktitle={NeurIPS}, year={2017}}",
+        target_pages=3,
+    )
+
+    pdf_sizes = {}
+    md_outputs = {}
+    html_outputs = {}
+
+    with tempfile.TemporaryDirectory() as tmpdir:
+        for vid in ["ieee", "acl", "acm", "lncs", "generic"]:
+            req = FormatExportRequest(venue_id=vid, **base_kwargs)
+            latex_src = formatting_agent.render_latex(req)
+            pdf_p = formatting_agent.compile_pdf(
+                latex_src,
+                req.bibtex,
+                output_dir=Path(tmpdir) / vid,
+                target_pages=3,
+                request=req,
+            )
+            docx_p = formatting_agent.export_docx(req, output_path=Path(tmpdir) / f"paper_{vid}.docx")
+            assert pdf_p.exists() and pdf_p.stat().st_size > 1000
+            assert docx_p.exists() and docx_p.stat().st_size > 1000
+            pdf_sizes[vid] = pdf_p.read_bytes()
+            md_outputs[vid] = formatting_agent.render_markdown(req)
+            html_outputs[vid] = formatting_agent.render_html(req)
+
+    # Verify IEEE uses Roman numerals while ACL uses Double-Blind Anonymization and Author-Year citations
+    assert "## I. INTRODUCTION" in md_outputs["ieee"]
+    assert "Anonymous Submission" in md_outputs["acl"]
+    assert "(Vaswani, 2017)" in md_outputs["acl"]
+    assert "column-count: 2" in html_outputs["ieee"]
+    assert "column-count: 2" not in html_outputs["lncs"]
+

@@ -1,7 +1,8 @@
 \documentclass[runningheads]{llncs}
 
 \usepackage{graphicx}
-\usepackage{amsmath,amssymb}
+\usepackage{amsmath,amssymb,amsfonts}
+\usepackage{algorithmic}
 \usepackage{booktabs}
 \usepackage{url}
 
@@ -47,7 +48,15 @@
 {{ ai_disclosure }}
 {% endif %}
 
+{% if bib_items %}
+\begin{thebibliography}{99}
+{% for item in bib_items %}
+\bibitem{ {{- item.key -}} } {{ item.formatted }}
+{% endfor %}
+\end{thebibliography}
+{% else %}
 \bibliographystyle{splncs04}
 \bibliography{references}
+{% endif %}
 
 \end{document}
